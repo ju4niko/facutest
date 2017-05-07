@@ -1,0 +1,52 @@
+     1                                  ;***********************************************************
+     2                                  ;   UTN-TD3-BOOTLOADER
+     3                                  ;***********************************************************
+     4                                  ;   Assembler: 
+     5                                  ;           nasm
+     6                                  ;   To assemble bootable disk: 
+     7                                  ;           make bootdisk
+     8                                  ;   To assemble bootloader code:
+     9                                  ;	    make bootloader
+    10                                  
+    11                                  [ORG 0x7C00];BIOS carga el bootsector a partir de esta direccion
+    12                                  
+    13                                  %ifndef KERNEL_MEMORY
+    14                                  	%error "la direccion de inicio del kernel debe estar definida"
+    15                                  	
+    16                                  %endif	
+    17                                  
+    18                                  %ifndef KERNEL_SIZE_SECTORS
+    19                                  	%error "tamaño del kernel en secrores no definido"
+    20                                  %endif	
+    21                                  
+    22                                  [BITS 16]   ;for real mode; 16-bit instructions
+    23                                  
+    24 00000000 87DB                    	xchg	bx, bx	;magic breakpoint
+    25 00000002 FA                      	cli		                       ;clear interrupts
+    26                                  ;-----------------------------------------------------------
+    27                                  ; INITIALIZATION PROCEDURES
+    28                                  
+    29                                  	
+    30                                  
+    31 00000003 B402                    	mov	ah, 02h			; load int 13h function (read sector)
+    32 00000005 B00A                    	mov	al,KERNEL_SIZE_SECTORS  ; load how many sectors will be read
+    33 00000007 B90200                  	mov	cx, 02h			; starting from track 0, sector 2
+    34 0000000A B600                    	mov	dh, 0			; load head = 0
+    35 0000000C B200                    	mov 	dl, 0 			; drive 0 (A:)
+    36 0000000E 66BB00100000            	mov	ebx, KERNEL_MEMORY	; load linear destination address at ebx
+    37 00000014 66C1EB04                	shr	ebx,4			; shift right ebx (result at BX will be the segment)
+    38 00000018 8EC3                    	mov	es,bx			; load destination segment
+    39 0000001A BB0000                  	mov	bx, 0			; load 0 offset  
+    40 0000001D CD13                    	int	13h			; read disk
+    41 0000001F 7205                    	jc	error			; if carry is set, int 13h didn't work
+    42 00000021 EA00000001              	jmp     (KERNEL_MEMORY>>4):0    ; jmp to the kernel code
+    43                                  error:
+    44 00000026 F4                      	hlt
+    45                                  ;***********************************************************
+    46                                  ; For the file to be identified as a valid boot sector,
+    47                                  ; the file must be of size 512 bytes, and the word at 510
+    48                                  ;' must be 0xAA55.
+    49 00000027 00<rept>                    times   510-($-$$)  db 0 ;fill the space till 510 
+    50                                                               ;with zeroes
+    51                                  
+    52 000001FE 55AA                        dw 0xAA55                ;boot sector identifier

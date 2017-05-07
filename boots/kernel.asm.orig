@@ -1,0 +1,239 @@
+%include "strucs3.inc"
+
+;------- EQU's y definiciones del sistema---------------------------
+IRQ0_BASE_INTERRUPT	EQU 	0
+c8254_BASE_FREQ		EQU 	1193180
+TIMER_TICK_PERIOD_MS	EQU	10
+CHANNEL0_MODULE		EQU	c8254_BASE_FREQ*TIMER_TICK_PERIOD_MS/1000
+STACK_SIZE		EQU	0xffff
+;----------------------------------------------
+
+[ORG KERNEL_MEMORY]
+
+[BITS 16] 
+%ifndef KERNEL_MEMORY
+        %error "Kernel start address not defined"
+        ;kernel_memory must be 16 byte aligned
+%endif
+
+
+
+start:
+	jmp Inicio
+
+
+;---------------Tablas y estructuras de datos del sistema -------------------------------
+
+; Tabla general del sistema (GDT)
+ALIGN 8,db 0
+
+GDT:
+db 0,0,0,0,0,0,0,0   ;dejar vacio un descriptor
+
+code_descriptor	equ $-GDT
+;DESCRIPTOR DE CODIGO FLAT (toda la memoria)
+dw 0xFFFF	;limite en uno
+dw 0x0000	;parte baja de la base en cero
+db 0x00		;base 16:23
+db 10011000b   ;presente,DPL(x2),sist(cod/dato),tipo(x4)(execute only)
+db 10001111b   ;granularidad(limite en mult de 4 pag), D/B, L,                 ;AVL(disponible), (16:19 del limite)
+db 0x00		;base
+
+data_descriptor	equ $-GDT
+;DESCRIPTOR IGUAL QUE EL ANTERIOR PERO DE DATO
+dw 0xFFFF	;limite en uno
+dw 0x0000	;parte baja de la base en cero
+db 0x00		;base 16:23
+db 10010010b   ;presente,DPL(x2),sist(cod/dato),tipo(x4)(read/write)
+db 10001111b   ;granularidad(limite en mult de 4 pag), D/B, L,                 ;AVL(disponible), (16:19 del limite)
+db 0x00		;base
+
+TSS_init_descriptor equ $-GDT
+	istruc descriptor
+	at limit_lo_word, 	dw	tss_struc_size		
+	at base_lo_word,    	dw	TSS_init
+	at base_hi_byte,	db	0
+	at access_rights,   	db	0b10001001  ;(P=1, DPL=0, Busy=1)
+	at limi_hi_byte,	db	0b00000000
+	at base_mh_byte,	db	0	
+	iend
+
+TSS_interrupt0_descriptor equ $-GDT
+	istruc descriptor
+	at limit_lo_word, 	dw	tss_struc_size		
+	at base_lo_word,    	dw	TSS_interrupt0
+	at base_hi_byte,	db	0
+	at access_rights,   	db	0b10001011  ;(P=1, DPL=0, Busy=1)
+	at limi_hi_byte,	db	0b00000000
+	at base_mh_byte,	db	0	
+	iend
+
+TSS_interrupt1_descriptor equ $-GDT
+	istruc descriptor
+	at limit_lo_word, 	dw	tss_struc_size		
+	at base_lo_word,    	dw	TSS_interrupt1
+	at base_hi_byte,	db	0
+	at access_rights,   	db	0b10001001  ;(P=1, DPL=0, Busy=0)
+	at limi_hi_byte,	db	0b00000000
+	at base_mh_byte,	db	0	
+	iend
+
+
+
+valor_gdtr:     dw $-GDT
+		dd GDT
+
+; Tabla de interrupciones del sistema (IDT)
+ALIGN 8,db 0
+IDT:
+INT0_Handler_Desc:
+	istruc system_descriptor
+		at Offset0_15,		dw	irq0_handler
+		at Selector,		dw	code_descriptor
+		at Param,		db	0
+		at access,		db	0b10000110
+		at Offset16_31,		dw	0
+	iend
+
+INT1_Handler_Desc:
+	istruc system_descriptor
+		at Offset0_15,		dw	0
+		at Selector,		dw	TSS_interrupt1_descriptor
+		at Param,		db	0
+		at access,		db	0b10000101
+		at Offset16_31,		dw	0
+	iend
+
+valor_idtr:     dw $-IDT
+		dd IDT
+
+;------ estructuras de TSS
+; como las defino con la macro struc, puedo inicializar solo los valores que uso, y
+; la longitud se define automáticamente como tss_struc_size
+ALIGN 8,db 0
+;TSS inicial del sistema
+TSS_init:
+	istruc tss_struc
+	iend
+
+TSS_Task_1:
+	istruc tss_struc
+	iend
+
+TSS_Task_2:
+	istruc tss_struc
+	iend
+
+TSS_interrupt0:	
+	istruc tss_struc
+	iend
+
+TSS_interrupt1:	
+	istruc tss_struc
+		at tss_struc.reg_EIP,		dd 	irq_task_handler 
+        	at tss_struc.reg_EFLAGS,    	dd	0x202
+        	at tss_struc.reg_ESP,       	dd	STACK_SIZE
+        	at tss_struc.reg_CS,        	dw	code_descriptor
+		at tss_struc.reg_SS,        	dw	data_descriptor
+         iend
+
+
+
+;------------Fin de espacio de tablas y estructuras del sistema
+	
+Inicio:
+
+	cli
+	call 	pic_reprogramming
+
+	lgdt [valor_gdtr]	;cargo valor de tabla en gdtr (base+limite, 48 bits)
+	lidt [valor_idtr]	;cargo valor de table en idtr (base+limite, 48 bits)
+
+	
+	mov al,0b11111100       ;OCW1: Set o Clear el IMR
+	out 21h,al		;habilito solo IRQ0 e IRQ1
+
+	mov eax,cr0		;seteo el bit 0 (PM) de CR0
+	or al,1
+	mov cr0,eax
+
+	jmp 08:ModoProt
+
+
+ModoProt:
+	mov ax,TSS_init_descriptor	;cargo el task register con la entrada de la GDT del TSS inicial
+	ltr ax
+	
+	sti	; habilito interrupciones
+	mov ax,10h
+	mov es,ax
+	mov ds,ax
+	mov es,ax
+	mov fs,ax
+	mov gs,ax	
+	mov ss,ax	;inicializo pila
+	mov esp, 0xffff ; 
+
+	mov al, '0'	;muestro '0' en el primer caracter
+codigo:
+	mov esi, 0x000b8000
+	mov [ds:esi],al		;escribo el primer valor
+	inc esi
+		
+	mov cx,2000
+	mov bx,70h
+
+lazo:
+	mov [ds:esi],bx
+	add esi,2
+	loop lazo
+
+	
+
+	jmp codigo
+
+
+pic_reprogramming:
+;------------------------------------------------------------------------------
+; Inicialización PIC #1
+  	mov al,11h        ;ICW1: IRQs activas por flanco, Modo cascada, ICW4 Si.
+  	out 20h,al
+  	mov al,IRQ0_BASE_INTERRUPT          ;ICW2: INT base para el PIC N#1 Tipo IRQ0_Base_interrupt
+  	out 21h,al
+  	mov al,04h        ;ICW3: PIC N#1 Master, tiene un Slave conectado a IRQ2 (0000 0100b)
+  	out 21h,al
+  	mov al,01h        ;ICW4: Modo No Buffered, Fin de Interrupción Normal, procesador 8086
+ 	out 21h,al
+  
+  ; Antes de inicializar el PIC #2, deshabilitamos las Interrupciones del PIC #1
+  	mov al,0FFh       ;OCW1: Set o Clear el IMR
+  	out 21h,al
+  
+  ; Inicialización PIC #2
+  	mov al,11h    			 ;ICW1: IRQs activas por flanco, Modo cascada, ICW4 Si.
+  	out 0A0h,al
+  	mov al,IRQ0_BASE_INTERRUPT + 8h        ;ICW2: INT base para el PIC N#1 Tipo IRQ0_Base_interrupt + 8h.
+  	out 0A1h,al
+  	mov al,02h        ;ICW3: PIC N#2 Slave, IRQ2 es la línea que envía al Master (010b)
+  	out 0A1h,al
+  	mov al,01h   ;ICW4: Modo No Buffered, Fin de Interrupción Normal, procesador 8086
+  	out 0A1h,al
+
+	ret
+;------------------------------------------------------------------------------
+
+irq0_handler:
+	push 	ax
+	mov	al, 20h		;send end of interrupt
+	out	20h, al		;
+	pop 	ax
+	iret
+
+irq_task_handler:
+	inc	eax		;incremento eax
+	cmp	eax, 0x100	;comparo con 0x100
+	jb	handler_exit	;si es menor, sigo
+	mov	eax, 0		;reseteao eax
+handler_exit:
+	iret
+	jmp irq_task_handler

@@ -1,0 +1,31 @@
+     1                                  [ORG 0x7C00];donde lo deja el BIOS
+     2                                  
+     3                                  
+     4                                  [BITS 16]   			;modo default del procesador
+     5                                  
+     6 00000000 87DB                    	xchg	bx, bx		;magic breakpoint
+     7 00000002 FA                      	cli		        	;clear interrupts
+     8                                  ;-----------------------------------------------------------
+     9                                  ; inic
+    10 00000003 B413                    	mov		ah, 0x13	;funcion print string de BIOS
+    11 00000005 B91500                  	mov		cx, len		;longtud del mensaje
+    12 00000008 B001                    	mov 	al,01h      ; mover cursor
+    13 0000000A B30B                    	mov 	bl,0bh      ; color magenta
+    14 0000000C B611                    	mov 	dh,17        ; fila
+    15 0000000E B204                    	mov 	dl,4        ; columna 
+    16 00000010 1E                      	push	ds
+    17 00000011 07                      	pop		es
+    18 00000012 BD[1800]                	mov		bp,msg		;puntero al mensae
+    19 00000015 CD10                    	int 	10h         ; servicio BIOS
+    20                                  			
+    21 00000017 F4                      	hlt
+    22                                  	
+    23 00000018 0A486F6C61206D756E-     msg     db  0xa,'Hola mundo en asm!',0xa,0xa		;mensaje
+    24 00000021 646F20656E2061736D-
+    25 0000002A 210A0A             
+    26                                  len     equ $ - msg 
+    27                                  ;***********************************************************
+    28                                  ;	firma de boot sector
+    29 0000002D 00<rept>                    times   510-($-$$)  db 0 	;rellena hasta terminar un sector de 512 
+    30                                  								;con ceros
+    31 000001FE 55AA                        dw 0xAA55   				;la firma propiamente dicha
