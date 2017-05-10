@@ -1,5 +1,12 @@
 section     .text
 global      _start                              ;debe declararse para el linker
+extern msg
+extern msg2
+extern msg3
+extern len
+extern len2
+extern len3
+
 
 _start:                                         ;le dice al linker el punto de inicio
 
@@ -30,10 +37,3 @@ _start:                                         ;le dice al linker el punto de i
 	int		0x80
 	
 
-section     .data
-msg     db  0xa,'Hola mundo en asm linux!1',0xa,0xa		;mensaje
-len     equ $ - msg  
-msg2     db  0xa,'Hola mundo en asm linux!2',0xa,0xa		;mensaje
-len2     equ $ - msg2  
-msg3     db  0xa,'Hola mundo en asm linux!3',0xa,0xa		;mensaje
-len3     equ $ - msg3  
