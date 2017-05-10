@@ -1,7 +1,6 @@
 section     .text
 global      _start                              ;debe declararse para el linker
-extern msg
-extern msg2
+extern msg, msg2
 extern msg3
 extern len
 extern len2
