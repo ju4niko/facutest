@@ -1,6 +1,3 @@
-
-
-
 section .mensajes2
 
 global	msg
