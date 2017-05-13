@@ -4,12 +4,15 @@ _imprime:
 ;pila:
 ;      |        | 
 ;      |  rip   |<----- rsp
-;      |   cs   |
-;      |  len   |
-;      |  msg   |
+;      |  len   |	rsp +8
+;      |  msg   |	rsp+16
 ;      +--------+
-    mov		rdx,  [rsp+8]                       ;longitud del mensaje
-    mov		rcx,  [rsp+16]                       ;puntero al mensaje
+
+	pop		rax		;recupero rip
+	pop		rdx		;longitud del mensaje
+	pop		rcx		;puntero al mensaje
+	push	rax		;lo pongo para el retorno
+	
     mov     ebx,1                               ;file descriptor (stdout)
     mov     eax,4                               ;nro de syscall (sys_write)
     int     0x80                                ;invoca puerta de llamada del kernel
