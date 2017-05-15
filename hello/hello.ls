@@ -7,29 +7,32 @@ INPUT(hello-rutinas.o)
 /*salida, en este caso un exe elf64*/
 OUTPUT(hello)	
 
+/* auto explicativo, ver objdump -i para listado de formatos
+en este caso de ejemplo para 64 bit ELF y arquitectura i386 de 64 bits*/
+OUTPUT_FORMAT(elf64-x86-64)
+OUTPUT_ARCH(i386:x86-64)
+
+/*indico el punto de entrada acorde al simbolo global en el fuente que
+tiene la primera instruccion a ejecutar*/
+ENTRY(_comienzo)
+
 /*secciones del ejecutable, ubicacion en mapa de memoria donde se van a cargar */
 SECTIONS
 {
-	/* . es el origen de generacion de direcciones para seccion*/
-	. = 0x400080;		/*valor tomado de un objdump de un elf64*/
-	.text : 
+/* . es el origen de generacion de direcciones para seccion*/
+	. = 0x400080;		/*valor tomado de un objdump de un elf64 de ejemplo*/	
+	.rutinas : 
 	{ 
-		hello.o(.text) 
+		hello-rutinas.o(.text)
 	} 
-	
-	/*en este ejemplo enumero una a una las input data sections
-	. = 0x4000bd;*/
-	
 	.datos : 
 	{ 
 		*(.mensajes)
 		hellodata.o	(.mensajes2)
 	}	
-
-	.rutinas : 
+	.inicio : 
 	{ 
-		hello-rutinas.o(.text)
+		hello.o(.text) 
 	} 
-	
 }
 
