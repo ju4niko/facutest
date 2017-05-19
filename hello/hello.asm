@@ -7,7 +7,7 @@ extern _imprime
 _comienzo:              ;le dice al linker el punto de inicio
 	; cargar en algun lado (puede ser la pila)
 	; puntero a mensaje y long
-	; y  llamar a rutina
+	; y  llamar a rutina.
 	push	msg
 	push	len
 	call	_imprime	;no hace falta balancear la pila al retorno, lo hace _imprime
