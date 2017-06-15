@@ -1,0 +1,373 @@
+     1                                  ;################################################################################
+     2                                  ;#	Título: Codigo principal de la aplicacion de 32 bits						#
+     3                                  ;#																				#
+     4                                  ;#	Versión:		1.0							Fecha: 	27/04/2015				#
+     5                                  ;#	Autor: 			D. Garcia					Tab: 	4						#
+     6                                  ;#	Compilación:	Usar Makefile												#
+     7                                  ;#	Uso: 			-															#
+     8                                  ;#	------------------------------------------------------------------------	#
+     9                                  ;#	Descripción:																#
+    10                                  ;#	------------------------------------------------------------------------	#
+    11                                  ;#	Revisiones:																	#
+    12                                  ;#		1.0 | 27/04/2015 | D.GARCIA | Inicial									#
+    13                                  ;#	------------------------------------------------------------------------	#
+    14                                  ;#	TODO:																		#
+    15                                  ;#		-																		#
+    16                                  ;################################################################################
+    17                                  extern print2
+    18                                  extern clrscr
+    19                                  extern Print_c ;funcion en c para eprobar escribir 
+    20                                  ;--------------------------------------------------------------------------------
+    21                                  ; Macros
+    22                                  ;--------------------------------------------------------------------------------
+    23                                  %define 	VGA_RAM		0xB8000
+    24                                  
+    25                                  ;--------------------------------------------------------------------------------
+    26                                  ; Simbolos externos
+    27                                  ;--------------------------------------------------------------------------------
+    28                                  
+    29                                  GLOBAL		start32
+    30                                  global 		TECLA_LEIDA
+    31                                  global texto_error
+    32                                  global texto_DE
+    33                                  global texto_DB
+    34                                  global texto_NMI
+    35                                  global texto_BP
+    36                                  global texto_OF
+    37                                  global texto_BR
+    38                                  global texto_UD
+    39                                  global texto_NM
+    40                                  global texto_DF
+    41                                  global texto_09
+    42                                  global texto_TS
+    43                                  global texto_NP
+    44                                  global texto_SS
+    45                                  global texto_GP
+    46                                  global texto_PF
+    47                                  global texto_MF
+    48                                  global texto_AC
+    49                                  global texto_MC
+    50                                  global texto_XF
+    51                                  
+    52                                  extern	irq_0_handler
+    53                                  extern 		print
+    54                                  extern 		cleansc
+    55                                  extern		MI_gdtr
+    56                                  extern		MI_IDT
+    57                                  extern		MI_idtr
+    58                                  extern		Desc_Dato32b	
+    59                                  extern		Desc_codigo32b
+    60                                  extern		Desc_Stack32b
+    61                                  extern		handler_vector
+    62                                  extern		idt_vector
+    63                                  extern		vector_end
+    64                                  extern 		Timer_Config
+    65                                  ;********************************************************************************
+    66                                  ; Datos
+    67                                  ;********************************************************************************
+    68                                  SECTION 	.data	
+    69 00000000 00                      TECLA_LEIDA db 0x00	
+    70 00000001 4D49205052494D4552-     msgInicio 	db "MI PRIMER PROGRAMA DESDE BIOS ....", 0
+    71 0000000A 2050524F4752414D41-
+    72 00000013 204445534445204249-
+    73 0000001C 4F53202E2E2E2E00   
+    74 00000024 6C617320696E746572-     msgIntON    db "las interrupciones han sido activadas....", 0
+    75 0000002D 72757063696F6E6573-
+    76 00000036 2068616E207369646F-
+    77 0000003F 206163746976616461-
+    78 00000048 732E2E2E2E00       
+    79 0000004E 486F6C61206D756E64-     msgPrueba_C 	db "Hola mundo c", 0
+    80 00000057 6F206300           
+    81 0000005B 456C2070726F677261-     msgEndProgram db "El programa finalizao correctamente...Adios..", 0
+    82 00000064 6D612066696E616C69-
+    83 0000006D 7A616F20636F727265-
+    84 00000076 6374616D656E74652E-
+    85 0000007F 2E2E4164696F732E2E-
+    86 00000088 00                 
+    87                                  ;string de sistema para las interrupciones
+    88 00000089 4E696E67756E612065-     texto_error db "Ninguna excepcion.....",0
+    89 00000092 7863657063696F6E2E-
+    90 0000009B 2E2E2E2E00         
+    91 000000A0 457863657063696F6E-     texto_DE: 	db "Excepcion #DE generada",0  	; IRQ 0
+    92 000000A9 202344452067656E65-
+    93 000000B2 7261646100         
+    94 000000B7 457863657063696F6E-     texto_DB: 	db "Excepcion #DB generada",0  	; IRQ 1
+    95 000000C0 202344422067656E65-
+    96 000000C9 7261646100         
+    97 000000CE 496E74657272757063-     texto_NMI: 	db "Interrupcion NMI      ",0	; IRQ 2 
+    98 000000D7 696F6E204E4D492020-
+    99 000000E0 2020202000         
+   100 000000E5 457863657063696F6E-     texto_BP: 	db "Excepcion #BP generada",0  	; IRQ 3
+   101 000000EE 202342502067656E65-
+   102 000000F7 7261646100         
+   103 000000FC 457863657063696F6E-     texto_OF: 	db "Excepcion #OF generada",0 	; IRQ 4	
+   104 00000105 20234F462067656E65-
+   105 0000010E 7261646100         
+   106 00000113 457863657063696F6E-     texto_BR: 	db "Excepcion #BR generada",0 	; IRQ 5
+   107 0000011C 202342522067656E65-
+   108 00000125 7261646100         
+   109 0000012A 457863657063696F6E-     texto_UD: 	db "Excepcion #UD generada",0 	; IRQ 6
+   110 00000133 202355442067656E65-
+   111 0000013C 7261646100         
+   112 00000141 457863657063696F6E-     texto_NM: 	db "Excepcion #NM generada",0 	; IRQ 7
+   113 0000014A 20234E4D2067656E65-
+   114 00000153 7261646100         
+   115 00000158 457863657063696F6E-     texto_DF: 	db "Excepcion #DF generada",0 	; IRQ 8
+   116 00000161 202344462067656E65-
+   117 0000016A 7261646100         
+   118 0000016F 457863657063696F6E-     texto_09: 	db "Excepcion #09 generada",0 	; IRQ 9
+   119 00000178 202330392067656E65-
+   120 00000181 7261646100         
+   121 00000186 457863657063696F6E-     texto_TS: 	db "Excepcion #TS generada",0 	; IRQ 10
+   122 0000018F 202354532067656E65-
+   123 00000198 7261646100         
+   124 0000019D 457863657063696F6E-     texto_NP: 	db "Excepcion #NP generada",0 	; IRQ 11
+   125 000001A6 20234E502067656E65-
+   126 000001AF 7261646100         
+   127 000001B4 457863657063696F6E-     texto_SS: 	db "Excepcion #SS generada",0 	; IRQ 12
+   128 000001BD 202353532067656E65-
+   129 000001C6 7261646100         
+   130 000001CB 457863657063696F6E-     texto_GP: 	db "Excepcion #GP generada",0 	; IRQ 13
+   131 000001D4 202347502067656E65-
+   132 000001DD 7261646100         
+   133 000001E2 457863657063696F6E-     texto_PF: 	db "Excepcion #PF generada",0 	; IRQ 14
+   134 000001EB 202350462067656E65-
+   135 000001F4 7261646100         
+   136 000001F9 457863657063696F6E-     texto_MF: 	db "Excepcion #MF generada",0 	; IRQ 16
+   137 00000202 20234D462067656E65-
+   138 0000020B 7261646100         
+   139 00000210 457863657063696F6E-     texto_AC: 	db "Excepcion #AC generada",0 	; IRQ 17
+   140 00000219 202341432067656E65-
+   141 00000222 7261646100         
+   142 00000227 457863657063696F6E-     texto_MC: 	db "Excepcion #MC generada",0 	; IRQ 18
+   143 00000230 20234D432067656E65-
+   144 00000239 7261646100         
+   145 0000023E 457863657063696F6E-     texto_XF: 	db "Excepcion #XF generada",0 	; IRQ 19
+   146 00000247 202358462067656E65-
+   147 00000250 7261646100         
+   148 00000255 457863657063696F6E-     texto_WLL: 	db "Excepcion generada NO CONFUGURADA",0 	; WLL
+   149 0000025E 2067656E6572616461-
+   150 00000267 204E4F20434F4E4655-
+   151 00000270 47555241444100     
+   152                                  
+   153                                  
+   154                                  
+   155                                  USE32
+   156                                  ;********************************************************************************
+   157                                  ; Codigo principal
+   158                                  ;********************************************************************************
+   159                                  SECTION  	.main 	;		progbits
+   160                                   
+   161                                  
+   162                                  
+   163                                  start32:
+   164 00000000 6687DB                  	xchg 	bx, bx						; Magic breakpoint
+   165                                  
+   166                                  	
+   167                                  Cargar_MI_GDT:
+   168                                  
+   169 00000003 0F0115[00000000]        	lgdt	[MI_gdtr]						; Recargo nueva MI_GDT	
+   170                                  	
+   171                                  	
+   172 0000000A EA[11000000][0000]      	jmp Desc_codigo32b:MI_programa	;solo si esta definido el segmento en una GDT
+   173                                  		
+   174                                  
+   175                                  
+   176                                  
+   177                                  
+   178                                  MI_programa:
+   179                                  
+   180                                  
+   181                                  
+   182                                  	;---------------------------
+   183                                  	; Cargo los selectores de datos, extra-datos  y de pila 
+   184                                  	;---------------------------
+   185 00000011 B8[00000000]            		mov eax, Desc_Dato32b
+   186 00000016 8ED8                    		mov ds, eax
+   187 00000018 8EC0                    		mov es, eax
+   188                                   
+   189 0000001A 66B8[0000]              		mov ax,Desc_Stack32b
+   190 0000001E 8ED0                    		mov ss, ax
+   191 00000020 BCFFFFFF07              		mov esp,0x7ffffff
+   192                                  		
+   193                                  
+   194                                  	
+   195                                  	;---------------------------
+   196                                  	; imprimo en pantalla mensaje inicio
+   197                                  	;---------------------------
+   198                                  	;xchg	bx, bx														;magic breakpoint
+   199 00000025 6A09                    	push 9 			;color
+   200 00000027 6A00                    	push 0			;fila
+   201 00000029 6A00                    	push 0			;columna
+   202 0000002B 68[01000000]            	push msgInicio
+   203 00000030 E8(00000000)            	call print
+   204 00000035 58                      	pop eax
+   205 00000036 58                      	pop eax
+   206 00000037 58                      	pop eax
+   207 00000038 58                      	pop eax
+   208                                  	;xchg	bx, bx														;magic breakpoint
+   209                                  
+   210                                  	;---------------------------
+   211                                  	; Limpio la pantalla
+   212                                  	;---------------------------
+   213                                  ;	call cleansc
+   214                                  
+   215                                  	;-------------------------------------------
+   216                                  	; Reprogramamos el PIC 1 & 2
+   217                                  	;-------------------------------------------
+   218 00000039 66BB2820                	mov 	bx, 0x2028					; Dir base donde se encuentran los PICs
+   219                                  
+   220                                  	; Init PIC N° 1
+   221 0000003D B011                    	mov		al, 0x11         			; (ICW1) IRQs activas x flanco, cascada, y ICW4
+   222 0000003F E620                    	out     0x20, al   					 
+   223 00000041 88F8                    	mov     al, bh          			; (ICW2) Offset - Arranca en IRQ_32 (BH=0x20)
+   224 00000043 E621                    	out     0x21, al
+   225 00000045 B004                    	mov     al, 0x04         			; (ICW3) PIC1 Master, Slave ingresa Int.x IRQ2
+   226 00000047 E621                    	out     0x21, al
+   227 00000049 B001                    	mov     al, 0x01         			; (ICW4) Modo 8086
+   228 0000004B E621                    	out     0x21, al
+   229                                  										 					
+   230 0000004D B0FD                    	mov     al, 0xFD 					; Enmascaramos interrupciones del PIC N° 1 (menos teclado)
+   231 0000004F E621                    	out     0x21, al
+   232                                  	
+   233                                  	; Init PIC N° 2
+   234 00000051 B011                    	mov     al, 0x11       			  	; (ICW1) IRQs activas x flanco,cascada, y ICW4
+   235 00000053 E6A0                    	out     0xA0, al  
+   236 00000055 88D8                    	mov    	al, bl          			; (ICW2) Offset - Arranca en IRQ_40 (BH=0x28)
+   237 00000057 E6A1                    	out     0xA1, al
+   238 00000059 B002                    	mov     al, 0x02         			; (ICW3) PIC2 Slave, ingresa x Int x IRQ2
+   239 0000005B E6A1                    	out     0xA1, al 
+   240 0000005D B001                    	mov     al, 0x01         			; (ICW4) Modo 8086
+   241 0000005F E6A1                    	out     0xA1, al
+   242                                  										 
+   243 00000061 B0FF                    	mov     al, 0xFF					; Enmascaramos interrupciones del PIC N° 2
+   244 00000063 E6A1                    	out     0xA1, al
+   245                                  
+   246 00000065 0F011D[00000000]        	lidt	[MI_idtr]						; Cargamos MI_idtr
+   247                                  	
+   248                                  	
+   249                                  	;HACER FUNCION LOCA PARA CARGAR EL OFFSET EN EL VECTOR DE INTERRUPCION
+   250 0000006C 6687DB                  	xchg	bx, bx														;magic breakpoint
+   251 0000006F 31D2                    	xor edx,edx 						;edx=0
+   252                                  	
+   253                                  
+   254                                  	set_handler:						;while(idt_vector!= end_of_vector)
+   255                                  
+   256 00000071 8B0495[00000000]        		mov eax,[handler_vector+edx*4] 	;eax=handler_vector[edx]
+   257 00000078 8B1C95[00000000]        		mov ebx,[idt_vector+edx*4]		;ebx=idt_vector[edx]
+   258 0000007F 83FBFF                  		cmp ebx,0xFFFFFFFF
+   259 00000082 7412                    		je inc_edx
+   260 00000084 81FB[00000000]          		cmp ebx,vector_end
+   261 0000008A 740D                    		je fin_init
+   262                                  
+   263 0000008C 668903                  		mov word[ebx  ],ax				;cargo el offset(15:0) del handler
+   264 0000008F C1E810                  		shr eax,0x10						;muevo los valores EAX(31:16) a EAX(15:0)
+   265 00000092 66894306                		mov word[ebx+6],ax				;cargo el offset(31:16) del handler
+   266                                  
+   267                                  		inc_edx:
+   268 00000096 42                      		inc edx 						;edx++
+   269                                  
+   270 00000097 E2D8                    	loop set_handler
+   271                                  
+   272                                  fin_init:
+   273                                  		;xchg	bx, bx														;magic breakpoint
+   274                                  
+   275                                  	;--------------------------------------------------
+   276                                  	; imprimo en pantalla que activo las interrupciones
+   277                                  	;--------------------------------------------------
+   278 00000099 6A09                    	push 9 			;color
+   279 0000009B 6A01                    	push 1			;fila
+   280 0000009D 6A01                    	push 1			;columna
+   281 0000009F 68[24000000]            	push msgIntON
+   282 000000A4 E8(00000000)            	call print
+   283 000000A9 58                      	pop eax
+   284 000000AA 58                      	pop eax
+   285 000000AB 58                      	pop eax
+   286 000000AC 58                      	pop eax
+   287                                  
+   288                                  ;xchg	bx, bx														;magic breakpoint
+   289                                  
+   290                                  
+   291                                  ;+++++++++++++++++++++++++++++++++++++++++
+   292                                  ;Activo las interrupciones para probarlas
+   293 000000AD FB                      	sti 								; Habilitamos interrupciones	
+   294                                  ;------------------------------------------------------------------
+   295                                  
+   296                                    
+   297                                  	
+   298 000000AE E8(00000000)            	call clrscr ; funcion en c 
+   299                                  ;**************************************************************
+   300                                  ; pruebo mi funcion para escribir en pantalla desde c
+   301                                  ;*************************	***********************************
+   302                                  ;	push 9 			;color
+   303                                  ;	push 1			;fila
+   304                                  ;	push 5			;columna
+   305                                  ;	push msgPrueba_C
+   306                                  	
+   307                                  ;	call Print_c
+   308                                  ;	pop eax
+   309                                  ;	pop eax
+   310                                  ;	pop eax
+   311                                  ;	pop eax
+   312                                  	
+   313 000000B3 6687DB                  	xchg	bx, bx														;magic breakpoint	
+   314                                  ;*******************************************
+   315                                  ;interrumpa cada 10ms el temporizador}
+   316                                  ;  no se si funciona bien, no pude probarlo
+   317                                  ;************************************
+   318 000000B6 E8(00000000)            	call Timer_Config
+   319                                  
+   320                                  ;******************************************
+   321                                  ;matios_sistem es el while(1) del programa
+   322                                  ;******************************************
+   323                                  	
+   324 000000BB CD20                    	int 32; activo la interrupcion para debug
+   325                                  
+   326                                  aca_loop:
+   327                                  
+   328 000000BD 6A09                    	push 9 			;color
+   329 000000BF 6A01                    	push 1			;fila
+   330 000000C1 6A01                    	push 1			;columna
+   331 000000C3 68[24000000]            	push msgIntON
+   332 000000C8 E8(00000000)            	call print
+   333 000000CD 58                      	pop eax
+   334 000000CE 58                      	pop eax
+   335 000000CF 58                      	pop eax
+   336 000000D0 58                      	pop eax
+   337                                  
+   338 000000D1 EBEA                          jmp aca_loop
+   339                                  
+   340                                  
+   341                                  	
+   342                                  		
+   343                                  	;---------------------------
+   344                                  	; entro a la funcion fin
+   345                                  	;---------------------------
+   346 000000D3 EB00                    	jmp fin
+   347                                  
+   348                                  		
+   349                                  	
+   350                                  ;*****************
+   351                                  ;Funcion de fin de programa
+   352                                  ;*****************
+   353                                  fin:
+   354                                  	;--------------------------------------------------
+   355                                  	; imprimo en pantalla que termino el programa
+   356                                  	;--------------------------------------------------
+   357 000000D5 6A01                    	push 0x01 			;color
+   358 000000D7 6A03                    	push 0x3			;fila
+   359 000000D9 6A03                    	push 0x3			;columna
+   360 000000DB 68[5B000000]            	push msgEndProgram
+   361 000000E0 E8(00000000)            	call print
+   362 000000E5 58                      	pop eax
+   363 000000E6 58                      	pop eax
+   364 000000E7 58                      	pop eax
+   365 000000E8 58                      	pop eax
+   366 000000E9 6687DB                  	xchg	bx, bx														;magic breakpoint
+   367                                  	;nop									; Ojo con esto!!
+   368 000000EC F4                      	hlt		
+   369 000000ED EBE6                    	jmp 	fin
+   370                                  	
+   371                                  
+   372                                  
+   373                                  

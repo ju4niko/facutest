@@ -1,0 +1,587 @@
+     1                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     2                                  ;       Handler de interrupciones
+     3                                  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     4                                  ;http://www.brokenthorn.com/Resources/OSDev15.html
+     5                                  USE32
+     6                                  SECTION .text
+     7                                  extern 	print
+     8                                  extern 	MI_IDT
+     9                                  extern 	Desc_codigo32b
+    10                                  extern	TECLA_LEIDA 		;esta definida en main.asm
+    11                                  
+    12                                  EXTERN texto_error
+    13                                  EXTERN texto_DE
+    14                                  EXTERN texto_DB
+    15                                  EXTERN texto_NMI
+    16                                  EXTERN texto_BP
+    17                                  EXTERN texto_OF
+    18                                  EXTERN texto_BR
+    19                                  EXTERN texto_UD
+    20                                  EXTERN texto_NM
+    21                                  EXTERN texto_DF
+    22                                  EXTERN texto_09
+    23                                  EXTERN texto_TS
+    24                                  EXTERN texto_NP
+    25                                  EXTERN texto_SS
+    26                                  EXTERN texto_GP
+    27                                  EXTERN texto_PF
+    28                                  EXTERN texto_MF
+    29                                  EXTERN texto_AC
+    30                                  EXTERN texto_MC
+    31                                  EXTERN texto_XF
+    32                                  ;  Los handler de interrupciones
+    33                                  global 	irq_0_handler  	;IRQ 0
+    34                                  global 	irq_1_handler  	;IRQ 1
+    35                                  global 	irq_2_handler  	;IRQ 2
+    36                                  global 	irq_3_handler  	;IRQ 3
+    37                                  global 	irq_4_handler  	;IRQ 4
+    38                                  global 	irq_5_handler  	;IRQ 5
+    39                                  global 	irq_6_handler  	;IRQ 6
+    40                                  global 	irq_7_handler  	;IRQ 7
+    41                                  global 	irq_8_handler  	;IRQ 8
+    42                                  global 	irq_9_handler  	;IRQ 9
+    43                                  global 	irq_10_handler 	;IRQ 10
+    44                                  global 	irq_11_handler 	;IRQ 11
+    45                                  global 	irq_12_handler 	;IRQ 12
+    46                                  global 	irq_13_handler 	;IRQ 13
+    47                                  global 	irq_14_handler 	;IRQ 14
+    48                                  global 	irq_16_handler  ;IRQ 16
+    49                                  global 	irq_17_handler  ;IRQ 17
+    50                                  global 	irq_18_handler  ;IRQ 18
+    51                                  global 	irq_19_handler  ;IRQ 19
+    52                                  global	timer_handler
+    53                                  global 	irq_keyb_handler	; handler del teclado
+    54                                  
+    55                                  
+    56                                  
+    57                                  
+    58                                  
+    59                                  %define		VERDE 			0x0A 		; Codigo de color VERDE
+    60                                  %define GRIS 0X07
+    61                                  %define 	TECLADO    		0x60 		; Dierccion E/S del buffer teclado
+    62                                  MS_SEGUNDOS_A_CONTAR 	equ 1000
+    63                                  
+    64                                  ;-------------------------------------------
+    65                                  ; Todos los handlers...
+    66                                  ;-------------------------------------------
+    67                                  
+    68                                  ;--------------------------------------------
+    69                                  ; IRQ 0 - #DE - FAULT 		 -> DIV (Division por 0)
+    70                                  irq_0_handler:
+    71                                  	
+    72                                  	
+    73                                  ;xchg	bx, bx														;magic breakpoint
+    74                                  	
+    75                                  	;pushad
+    76                                  	
+    77 00000000 6A07                    	push GRIS 			; Color
+    78 00000002 6A05                    	push 0x05 			; Fila
+    79 00000004 6A00                    	push 0x00 			; Columna
+    80 00000006 68[00000000]            	push texto_DE 		; Mensaje
+    81 0000000B E8(00000000)            	call print
+    82                                  
+    83                                  
+    84                                  	irq_0_handler_end:
+    85 00000010 58                      	pop eax ;pop color 
+    86 00000011 58                      	pop eax	;pop fila
+    87 00000012 58                      	pop eax;pop columna
+    88 00000013 58                      	pop eax;pop mensaje
+    89                                  		
+    90                                  	;popad
+    91                                  	;inc ecx 			; Salvamos Excepcion
+    92                                  
+    93 00000014 CF                      	iret 
+    94                                  
+    95                                  ; IRQ 1 - #DB - FAULT/TRAP   -> Depuracion
+    96                                  irq_1_handler:
+    97                                  
+    98                                  	;pushad
+    99                                  
+   100 00000015 6A07                    	push GRIS 			; Color
+   101 00000017 6A05                    	push 0x05 			; Fila
+   102 00000019 6A00                    	push 0x00 			; Columna
+   103 0000001B 68[00000000]            	push texto_DB 		; Mensaje
+   104 00000020 E8(00000000)            	call print
+   105                                  
+   106                                  	irq_1_handler_end:
+   107                                  	;popad
+   108 00000025 58                      	pop eax ;pop color 
+   109 00000026 58                      	pop eax	;pop fila
+   110 00000027 58                      	pop eax;pop columna
+   111 00000028 58                      	pop eax;pop mensaje
+   112 00000029 CF                      	iret 
+   113                                  
+   114                                  ; IRQ 2 - NMI - Interrupcion -> Interrupcion no mascarable 
+   115                                  irq_2_handler:
+   116                                  
+   117                                  	;pushad
+   118                                  
+   119 0000002A 6A07                    	push GRIS 			; Color
+   120 0000002C 6A05                    	push 0x05 			; Fila
+   121 0000002E 6A00                    	push 0x00 			; Columna
+   122 00000030 68[00000000]            	push texto_NMI 		; Mensaje
+   123 00000035 E8(00000000)            	call print
+   124                                  
+   125                                  
+   126                                  	irq_2_handler_end:
+   127                                  	;popad
+   128 0000003A 58                      	pop eax ;pop color 
+   129 0000003B 58                      	pop eax	;pop fila
+   130 0000003C 58                      	pop eax;pop columna
+   131 0000003D 58                      	pop eax;pop mensaje
+   132 0000003E CF                      	iret 
+   133                                  
+   134                                  ; IRQ 3 - #BP - TRAP (INT 3) -> Punto de ruptura
+   135                                  irq_3_handler:
+   136                                  
+   137                                  	;pushad
+   138                                  
+   139 0000003F 6A07                    	push GRIS 			; Color
+   140 00000041 6A05                    	push 0x05 			; Fila
+   141 00000043 6A00                    	push 0x00 			; Columna
+   142 00000045 68[00000000]            	push texto_BP 		; Mensaje
+   143 0000004A E8(00000000)            	call print
+   144                                  
+   145                                  
+   146                                  	; Salvamos Excepcion
+   147                                  
+   148                                  	irq_3_handler_end:
+   149 0000004F 58                      	pop eax ;pop color 
+   150 00000050 58                      	pop eax	;pop fila
+   151 00000051 58                      	pop eax;pop columna
+   152 00000052 58                      	pop eax;pop mensaje
+   153                                  	;popad
+   154 00000053 CF                      	iret 
+   155                                  
+   156                                  ; IRQ 4 - #OF - TRAP (INT 0) -> Overflow
+   157                                  irq_4_handler:
+   158                                  
+   159                                  	;pushad
+   160                                  
+   161 00000054 6A07                    	push GRIS 			; Color
+   162 00000056 6A05                    	push 0x05 			; Fila
+   163 00000058 6A00                    	push 0x00 			; Columna
+   164 0000005A 68[00000000]            	push texto_OF 		; Mensaje
+   165 0000005F E8(00000000)            	call print
+   166                                  
+   167                                  	
+   168                                  
+   169                                  	; Salvamos Excepcion
+   170                                  
+   171                                  	irq_4_handler_end:
+   172 00000064 58                      	pop eax ;pop color 
+   173 00000065 58                      	pop eax	;pop fila
+   174 00000066 58                      	pop eax;pop columna
+   175 00000067 58                      	pop eax;pop mensaje
+   176                                  	;popad
+   177 00000068 CF                      	iret
+   178                                  
+   179                                  ; IRQ 5 - #BR - FAULT 		 -> Comprobacion de limites
+   180                                  irq_5_handler:
+   181                                  
+   182                                  	;pushad
+   183                                  
+   184 00000069 6A07                    	push GRIS 			; Color
+   185 0000006B 6A05                    	push 0x05 			; Fila
+   186 0000006D 6A00                    	push 0x00 			; Columna
+   187 0000006F 68[00000000]            	push texto_BR 		; Mensaje
+   188 00000074 E8(00000000)            	call print
+   189                                  
+   190                                  	
+   191                                  
+   192                                  	; Salvamos Excepcion
+   193                                  
+   194                                  	irq_5_handler_end:
+   195 00000079 58                      	pop eax ;pop color 
+   196 0000007A 58                      	pop eax	;pop fila
+   197 0000007B 58                      	pop eax;pop columna
+   198 0000007C 58                      	pop eax;pop mensaje
+   199                                  	;popad
+   200 0000007D CF                      	iret
+   201                                  
+   202                                  ; IRQ 6 - #UD - FAULT		 -> Codigo OP no valido
+   203                                  irq_6_handler:
+   204                                  
+   205                                  	;pushad
+   206                                  
+   207 0000007E 6A07                    	push GRIS 			; Color
+   208 00000080 6A05                    	push 0x05 			; Fila
+   209 00000082 6A00                    	push 0x00 			; Columna
+   210 00000084 68[00000000]            	push texto_UD 		; Mensaje
+   211 00000089 E8(00000000)            	call print
+   212                                  
+   213                                  
+   214                                  
+   215                                  	; Salvamos Excepcion
+   216                                  
+   217                                  	irq_6_handler_end:
+   218 0000008E 58                      	pop eax ;pop color 
+   219 0000008F 58                      	pop eax	;pop fila
+   220 00000090 58                      	pop eax;pop columna
+   221 00000091 58                      	pop eax;pop mensaje
+   222                                  	;popad
+   223 00000092 CF                      	iret
+   224                                  
+   225                                  ; IRQ 7 - #NM - FAULT  		 -> Coprocesador disponible
+   226                                  irq_7_handler:
+   227                                  
+   228                                  	;pushad
+   229                                  
+   230 00000093 6A07                    	push GRIS 			; Color
+   231 00000095 6A05                    	push 0x05 			; Fila
+   232 00000097 6A00                    	push 0x00 			; Columna
+   233 00000099 68[00000000]            	push texto_NM 		; Mensaje
+   234 0000009E E8(00000000)            	call print
+   235                                  
+   236                                  	
+   237                                  
+   238                                  	; Salvamos Excepcion
+   239                                  
+   240                                  	irq_7_handler_end:
+   241 000000A3 58                      	pop eax ;pop color 
+   242 000000A4 58                      	pop eax	;pop fila
+   243 000000A5 58                      	pop eax;pop columna
+   244 000000A6 58                      	pop eax;pop mensaje
+   245                                  	;popad
+   246 000000A7 CF                      	iret
+   247                                  
+   248                                  ; IRQ 8 - #DF - ABORT 		 -> Doble Falta
+   249                                  irq_8_handler:
+   250                                  
+   251                                  	;pushad
+   252                                  
+   253 000000A8 6A07                    	push GRIS 			; Color
+   254 000000AA 6A05                    	push 0x05 			; Fila
+   255 000000AC 6A00                    	push 0x00 			; Columna
+   256 000000AE 68[00000000]            	push texto_DF 		; Mensaje
+   257 000000B3 E8(00000000)            	call print
+   258                                  
+   259                                  	
+   260                                  
+   261                                  	; Salvamos Excepcion
+   262                                  
+   263                                  	irq_8_handler_end:
+   264 000000B8 58                      	pop eax ;pop color 
+   265 000000B9 58                      	pop eax	;pop fila
+   266 000000BA 58                      	pop eax;pop columna
+   267 000000BB 58                      	pop eax;pop mensaje
+   268                                  	;popad
+   269                                  	
+   270 000000BC CF                      	iret
+   271                                  
+   272                                  ; IRQ 9 - 09 - FAULT 		 -> Error en coma flotante
+   273                                  irq_9_handler:
+   274                                  
+   275                                  	;pushad
+   276                                  
+   277 000000BD 6A07                    	push GRIS 			; Color
+   278 000000BF 6A05                    	push 0x05 			; Fila
+   279 000000C1 6A00                    	push 0x00 			; Columna
+   280 000000C3 68[00000000]            	push texto_09 		; Mensaje
+   281 000000C8 E8(00000000)            	call print
+   282                                  
+   283                                  	
+   284                                  
+   285                                  	; Salvamos Excepcion
+   286                                  
+   287                                  	irq_9_handler_end:
+   288 000000CD 58                      	pop eax ;pop color 
+   289 000000CE 58                      	pop eax	;pop fila
+   290 000000CF 58                      	pop eax;pop columna
+   291 000000D0 58                      	pop eax;pop mensaje
+   292                                  	;popad
+   293 000000D1 CF                      	iret
+   294                                  
+   295                                  ; IRQ 10 - #TS - FAULT 		 -> TSS no valida (para conmutacion de tareas)
+   296                                  irq_10_handler:
+   297                                  
+   298                                  	;pushad
+   299                                  
+   300 000000D2 6A07                    	push GRIS 			; Color
+   301 000000D4 6A05                    	push 0x05 			; Fila
+   302 000000D6 6A00                    	push 0x00 			; Columna
+   303 000000D8 68[00000000]            	push texto_TS 		; Mensaje
+   304 000000DD E8(00000000)            	call print
+   305                                  
+   306                                  	
+   307                                  
+   308                                  	; Salvamos Excepcion
+   309                                  
+   310                                  	irq_10_handler_end:
+   311 000000E2 58                      	pop eax ;pop color 
+   312 000000E3 58                      	pop eax	;pop fila
+   313 000000E4 58                      	pop eax;pop columna
+   314 000000E5 58                      	pop eax;pop mensaje
+   315                                  	;popad
+   316                                  	
+   317 000000E6 CF                      	iret
+   318                                  
+   319                                  ; IRQ 11 - #NP - FAULT 		 -> Error en carga de segmento
+   320                                  irq_11_handler:
+   321                                  
+   322                                  	;pushad
+   323                                  
+   324 000000E7 6A07                    	push GRIS 			; Color
+   325 000000E9 6A05                    	push 0x05 			; Fila
+   326 000000EB 6A00                    	push 0x00 			; Columna
+   327 000000ED 68[00000000]            	push texto_NP 		; Mensaje
+   328 000000F2 E8(00000000)            	call print
+   329                                  
+   330                                  	
+   331                                  
+   332                                  	; Salvamos Excepcion
+   333                                  
+   334                                  	irq_11_handler_end:
+   335 000000F7 58                      	pop eax ;pop color 
+   336 000000F8 58                      	pop eax	;pop fila
+   337 000000F9 58                      	pop eax;pop columna
+   338 000000FA 58                      	pop eax;pop mensaje
+   339                                  	;popad
+   340                                  	
+   341 000000FB CF                      	iret
+   342                                  
+   343                                  ; IRQ 12 - #SS - FAULT 		 -> Error en operaciones de pila y selctor SS
+   344                                  irq_12_handler:
+   345                                  
+   346                                  	;pushad
+   347                                  
+   348 000000FC 6A07                    	push GRIS 			; Color
+   349 000000FE 6A05                    	push 0x05 			; Fila
+   350 00000100 6A00                    	push 0x00 			; Columna
+   351 00000102 68[00000000]            	push texto_SS 		; Mensaje
+   352 00000107 E8(00000000)            	call print
+   353                                  
+   354                                  	
+   355                                  
+   356                                  	; Salvamos Excepcion
+   357                                  
+   358                                  	irq_12_handler_end:
+   359 0000010C 58                      	pop eax ;pop color 
+   360 0000010D 58                      	pop eax	;pop fila
+   361 0000010E 58                      	pop eax;pop columna
+   362 0000010F 58                      	pop eax;pop mensaje
+   363                                  	;popad
+   364 00000110 CF                      	iret
+   365                                  
+   366                                  ; IRQ 13 - #GP - FAULT		 -> Eerror en referencia a memoria y proteccion
+   367                                  irq_13_handler:
+   368                                  
+   369                                  	;pushad
+   370                                  															;magic breakpoint
+   371 00000111 6687DB                  	xchg	bx, bx		;magic breakpoint	
+   372 00000114 90                      	nop
+   373                                  	
+   374                                  	
+   375 00000115 6A07                    	push GRIS 			; Color
+   376 00000117 6A05                    	push 0x05 			; Fila
+   377 00000119 6A00                    	push 0x00 			; Columna
+   378 0000011B 68[00000000]            	push texto_GP 		; Mensaje
+   379 00000120 E8(00000000)            	call print
+   380 00000125 6687DB                  	xchg	bx, bx	
+   381                                  
+   382                                  
+   383                                  	irq_13_handler_end:
+   384 00000128 58                      	pop eax ;pop color 
+   385 00000129 58                      	pop eax	;pop fila
+   386 0000012A 58                      	pop eax;pop columna
+   387 0000012B 58                      	pop eax;pop mensaje
+   388                                  	;popad
+   389                                  	
+   390 0000012C CF                      	iret
+   391                                  
+   392                                  ; IRQ 14 - #PF - FAULT 		 -> Page FAULT
+   393                                  irq_14_handler:
+   394                                  
+   395                                  	;pushad
+   396                                  
+   397 0000012D 6A07                    	push GRIS 			; Color
+   398 0000012F 6A05                    	push 0x05 			; Fila
+   399 00000131 6A00                    	push 0x00 			; Columna
+   400 00000133 68[00000000]            	push texto_PF 		; Mensaje
+   401 00000138 E8(00000000)            	call print
+   402                                  
+   403                                  	
+   404                                  
+   405                                  	; Salvamos Excepcion
+   406                                  
+   407                                  	irq_14_handler_end:
+   408 0000013D 58                      	pop eax ;pop color 
+   409 0000013E 58                      	pop eax	;pop fila
+   410 0000013F 58                      	pop eax;pop columna
+   411 00000140 58                      	pop eax;pop mensaje
+   412                                  	;popad
+   413                                  	
+   414 00000141 CF                      	iret
+   415                                  
+   416                                  ; IRQ 16 - #MF - FAULT		 -> Error en coma flotante y FPU
+   417                                  irq_16_handler:
+   418                                  
+   419                                  	;pushad
+   420                                  
+   421 00000142 6A07                    	push GRIS 			; Color
+   422 00000144 6A05                    	push 0x05 			; Fila
+   423 00000146 6A00                    	push 0x00 			; Columna
+   424 00000148 68[00000000]            	push texto_MF 		; Mensaje
+   425 0000014D E8(00000000)            	call print
+   426                                  
+   427                                  	
+   428                                  
+   429                                  	; Salvamos Excepcion
+   430                                  
+   431                                  	irq_16_handler_end:
+   432 00000152 58                      	pop eax ;pop color 
+   433 00000153 58                      	pop eax	;pop fila
+   434 00000154 58                      	pop eax;pop columna
+   435 00000155 58                      	pop eax;pop mensaje
+   436                                  	;popad
+   437 00000156 CF                      	iret
+   438                                  
+   439                                  ; IRQ 17 - #AC - FAULT 		 -> Comprobacion de alineamiento
+   440                                  irq_17_handler:
+   441                                  
+   442                                  	;pushad
+   443                                  
+   444 00000157 6A07                    	push GRIS 			; Color
+   445 00000159 6A05                    	push 0x05 			; Fila
+   446 0000015B 6A00                    	push 0x00 			; Columna
+   447 0000015D 68[00000000]            	push texto_AC 		; Mensaje
+   448 00000162 E8(00000000)            	call print
+   449                                  
+   450                                  	
+   451                                  
+   452                                  	; Salvamos Excepcion
+   453                                  
+   454                                  	irq_17_handler_end:
+   455 00000167 58                      	pop eax ;pop color 
+   456 00000168 58                      	pop eax	;pop fila
+   457 00000169 58                      	pop eax;pop columna
+   458 0000016A 58                      	pop eax;pop mensaje
+   459                                  	;popad
+   460 0000016B CF                      	iret
+   461                                  
+   462                                  ; IRQ 18 - #MC - ABORT		 -> Comprobacion de maquina
+   463                                  irq_18_handler:
+   464                                  
+   465                                  	;pushad
+   466                                  
+   467 0000016C 6A07                    	push GRIS 			; Color
+   468 0000016E 6A05                    	push 0x05 			; Fila
+   469 00000170 6A00                    	push 0x00 			; Columna
+   470 00000172 68[00000000]            	push texto_MC 		; Mensaje
+   471 00000177 E8(00000000)            	call print
+   472                                  
+   473                                  	
+   474                                  
+   475                                  	; Salvamos Excepcion
+   476                                  
+   477                                  	irq_18_handler_end:
+   478 0000017C 58                      	pop eax ;pop color 
+   479 0000017D 58                      	pop eax	;pop fila
+   480 0000017E 58                      	pop eax;pop columna
+   481 0000017F 58                      	pop eax;pop mensaje
+   482                                  	;popad
+   483 00000180 CF                      	iret
+   484                                  
+   485                                  ; IRQ 19 - #XF - FAULT 		 -> Coma flotante SIMD
+   486                                  irq_19_handler:
+   487                                  
+   488                                  	;pushad
+   489                                  
+   490 00000181 6A07                    	push GRIS 			; Color
+   491 00000183 6A05                    	push 0x05 			; Fila
+   492 00000185 6A00                    	push 0x00 			; Columna
+   493 00000187 68[00000000]            	push texto_XF 		; Mensaje
+   494 0000018C E8(00000000)            	call print
+   495                                  
+   496                                  	
+   497                                  
+   498                                  	; Salvamos Excepcion
+   499                                  
+   500                                  	irq_19_handler_end:
+   501 00000191 58                      	pop eax ;pop color 
+   502 00000192 58                      	pop eax	;pop fila
+   503 00000193 58                      	pop eax;pop columna
+   504 00000194 58                      	pop eax;pop mensaje
+   505                                  	;popad
+   506 00000195 CF                      	iret
+   507                                  	
+   508                                  ; IRQ 32 - Interrupcion de Timer ###############################
+   509 00000196 303000                  timerValue: 	db "00", 0
+   510                                  
+   511                                   
+   512                                  timer_handler:
+   513 00000199 6687DB                  	xchg	bx, bx		;magic breakpoint
+   514 0000019C 90                      	nop
+   515 0000019D 6687DB                  	xchg	bx, bx		;magic breakpoint	
+   516 000001A0 90                      	nop
+   517 000001A1 90                      	nop
+   518                                  	
+   519                                  		
+   520 000001A2 668B15[96010000]        	mov dx, word [timerValue] 		; Obtenemos valor de cunta [little endian]
+   521                                  
+   522 000001A9 FEC6                    	inc dh									; Incrementamos unidades...
+   523 000001AB 80FE39                  	cmp dh, '9'								; Verificamos si paso de 9...
+   524 000001AE 7E0B                    	jle update_screenValue 						; Si no paso continua...
+   525                                  
+   526 000001B0 B630                    	mov dh, '0'								; Seteamos las unidades en 0
+   527 000001B2 FEC2                    	inc dl									; Incrementamos decenas...
+   528 000001B4 80FA39                  	cmp dl, '9'								; Verificamos si paso de 9...
+   529 000001B7 7E02                    	jle update_screenValue 						; Si no paso continua...
+   530                                  
+   531 000001B9 B230                    	mov dl, '0' 							; Seteamos decenas en 0
+   532                                  
+   533                                  	update_screenValue: 							; Actualizamos pantalla
+   534                                  
+   535 000001BB 668915[96010000]        		mov word [timerValue], dx 	; Actualizamos valor de cuenta
+   536                                  
+   537 000001C2 6A0A                    		push VERDE 							; Color
+   538 000001C4 6A08                    		push 0x08 							; Fila
+   539 000001C6 6A00                    		push 0x00 							; Columna
+   540 000001C8 68[96010000]            		push timerValue 	     			; Mensaje
+   541 000001CD E8(00000000)            		call print
+   542 000001D2 58                      		pop eax
+   543 000001D3 58                      		pop eax
+   544 000001D4 58                      		pop eax
+   545 000001D5 58                      		pop eax
+   546                                  		
+   547                                  	
+   548 000001D6 CF                      	iret 								
+   549                                  
+   550                                  ; ### END TIMER HANDLER #################################################
+   551                                  
+   552                                  
+   553                                  ; IRQ 33 - Interrupcion de teclado ######################################
+   554                                  irq_keyb_handler:
+   555                                  
+   556                                  	;pushad 				; Salvamos registros
+   557 000001D7 6687DB                  	xchg	bx, bx		;magic breakpoint
+   558 000001DA 90                      	nop
+   559 000001DB 90                      	nop
+   560 000001DC 6687DB                  	xchg	bx, bx		;magic breakpoint	
+   561                                  		
+   562 000001DF 31C0                    	xor eax, eax 		; Inicializamos registros
+   563 000001E1 31D2                    	xor edx, edx 		
+   564                                  
+   565 000001E3 E460                    	in 	al , TECLADO	; Leemos teclado y queda guardado en EAX
+   566 000001E5 BA[00000000]                mov edx, TECLA_LEIDA; Cargamos el puntero de la variable TECLA_LEIDA
+   567                                  
+   568 000001EA 6687DB                  	xchg	bx, bx		;magic breakpoint	
+   569                                  
+   570                                  	
+   571 000001ED 3D81000000                  cmp eax, 0x81 		; Checkeamos Breakcode...
+   572 000001F2 7E02                        jle keyb_handler_end
+   573 000001F4 B000                        mov al , 0x00 		; Si es un breakcode... no hay tecla nueva...
+   574                                  
+   575                                  	keyb_handler_end:
+   576                                  	;push eax 	; Almacenamos la tecla en la pila actualizada... 
+   577 000001F6 B020                    	mov al, 0x20
+   578 000001F8 E620                        out 0x20, al 		; Habilitamos nuevamente el PIC para interrumpir
+   579                                       ;popad				; Recuperamos registros
+   580 000001FA CF                      	iret 				; Retornamos al programa...
+   581                                  
+   582                                  ; ### END KEYBOARD HANDLER ##############################################
+   583                                  
+   584                                  ; IRQ 34 - IRQ Mal configurada para generar GP (CS MAL CONFIGURADO)
+   585                                  IRQ_MAL_CONFIGURADA:
+   586                                  	
+   587 000001FB CF                      	iret

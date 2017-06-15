@@ -1,0 +1,216 @@
+     1                                  ;################################################################################
+     2                                  ;#	Título: Ejemplo basico de inicio desde BIOS									#
+     3                                  ;#																				#
+     4                                  ;#	Versión:		2.0							Fecha: 	22/08/2015				#
+     5                                  ;#	Autor: 			D. Garcia					Tab: 	4						#
+     6                                  ;#	Compilación:	Usar Makefile												#
+     7                                  ;#	Uso: 			-															#
+     8                                  ;#	------------------------------------------------------------------------	#
+     9                                  ;#	Descripción:																#
+    10                                  ;#		Inicializacion de un sistema basico desde BIOS							#
+    11                                  ;#		Genera una BIOS ROM de 64kB para inicializacion y codigo principal		#
+    12                                  ;#	------------------------------------------------------------------------	#
+    13                                  ;#	Revisiones:																	#
+    14                                  ;#		2.0 | 22/08/2015 | D.GARCIA | Inicio desde BIOS. Cambio de VMA			#
+    15                                  ;#		1.0 | 04/03/2013 | D.GARCIA | Inicial									#
+    16                                  ;#	------------------------------------------------------------------------	#
+    17                                  ;#	TODO:																		#
+    18                                  ;#		-																		#
+    19                                  ;################################################################################
+    20                                  
+    21                                  %define		STACK_ADDR		0x00140000	; Direccion fisica para la pila
+    22                                  %define 	STACK_SIZE		32*1024		; 32kB
+    23                                  
+    24                                  ;********************************************************************************
+    25                                  ; Simbolos externos y globales
+    26                                  ;********************************************************************************
+    27                                  GLOBAL 		Entry
+    28                                  EXTERN		__sys_tables_LMA
+    29                                  EXTERN		__sys_tables_start
+    30                                  EXTERN		__sys_tables_end
+    31                                  EXTERN		__main_LMA
+    32                                  EXTERN		__main_start
+    33                                  EXTERN		__main_end
+    34                                  EXTERN		__mdata_LMA
+    35                                  EXTERN		__mdata_start
+    36                                  EXTERN		__mdata_end
+    37                                  EXTERN		__bss_start
+    38                                  EXTERN		__bss_end
+    39                                  EXTERN		start32
+    40                                  ;----de mi funcion c
+    41                                  EXTERN	__funcion_LMA				; Puntero al inicio de la LMA, solo parte baja 
+    42                                  EXTERN	__funcion_start			; Puntero a la VMA
+    43                                  EXTERN	__funcion_end
+    44                                  
+    45                                  ;-------------------
+    46                                  
+    47                                  ;********************************************************************************
+    48                                  ; Seccion de codigo de inicializacion
+    49                                  ;********************************************************************************
+    50                                  USE16
+    51                                  SECTION 	.reset_vector					; Reset vector del procesador
+    52                                  
+    53                                  Entry:										; Punto de entrada definido en el linker
+    54 00000000 66E9(00000000)          	jmp 	dword start						; Punto de entrada de mi BIOS
+    55 00000006 00<rept>                	times   16-($-Entry) db 0				; Relleno hasta el final de la ROM
+    56                                  
+    57                                  ;********************************************************************************
+    58                                  ; Seccion de codigo de inicializacion
+    59                                  ;********************************************************************************
+    60                                  USE32
+    61                                  SECTION 	.init
+    62                                  ;--------------------------------------------------------------------------------
+    63                                  ; Punto de entrada
+    64                                  ;--------------------------------------------------------------------------------
+    65                                  start:									; Punto de entrada
+    66 00000000 <incbin>                	INCBIN "init16.bin"					; Binario de 16 bits
+    67                                  
+    68                                  	;xchg bx, bx							; Magic breakpoint
+    69                                  										; Inicializo tablas de sistema en asm
+    70                                  										; mover codigo a direccion virutal VMA ya que no 
+    71                                  										; se puede resolver en tiempo de compilacion
+    72 000013BE BE[00000000]            	mov 	esi, __sys_tables_LMA		; Puntero al inicio de la LMA, solo parte baja 
+    73 000013C3 BF[00000000]            	mov 	edi, __sys_tables_start		; Puntero a la VMA
+    74 000013C8 B9[00000000]            	mov		ecx, __sys_tables_end
+    75 000013CD 81E9[00000000]          	sub		ecx, __sys_tables_start		; Calculo tamaño
+    76 000013D3 F3A4                    	rep		movsb	
+    77                                  
+    78 000013D5 BE[00000000]            	mov 	esi, __main_LMA				; Puntero al inicio de la LMA, solo parte baja 
+    79 000013DA BF[00000000]            	mov 	edi, __main_start			; Puntero a la VMA
+    80 000013DF B9[00000000]            	mov		ecx, __main_end	
+    81 000013E4 81E9[00000000]          	sub		ecx, __main_start			; Calculo tamaño
+    82 000013EA F3A4                    	rep		movsb	
+    83                                  	
+    84                                  	;+++++++++++++++++++++++++
+    85                                  	;mi funcion en c
+    86                                  	;++++++++++++++++++++++++
+    87 000013EC BE[00000000]            	mov 	esi, __funcion_LMA				; Puntero al inicio de la LMA, solo parte baja 
+    88 000013F1 BF[00000000]            	mov 	edi, __funcion_start			; Puntero a la VMA
+    89 000013F6 B9[00000000]            	mov		ecx, __funcion_end
+    90 000013FB 81E9[00000000]          	sub		ecx, __funcion_start			; Calculo tamaño
+    91 00001401 F3A4                    	rep		movsb	
+    92                                  	;++++++++++++++++++++++++
+    93                                  	
+    94 00001403 BE[00000000]            	mov 	esi, __mdata_LMA			; Puntero al inicio de la LMA, solo parte baja 
+    95 00001408 BF[00000000]            	mov 	edi, __mdata_start			; Puntero a la VMA
+    96 0000140D B9[00000000]            	mov		ecx, __mdata_end	
+    97 00001412 81E9[00000000]          	sub		ecx, __mdata_start			; Calculo tamaño
+    98 00001418 F3A4                    	rep		movsb	
+    99                                  	
+   100 0000141A 6631C0                  	xor		ax, ax
+   101 0000141D BF[00000000]            	mov 	edi, __bss_start			; Puntero a la VMA
+   102 00001422 B9[00000000]            	mov		ecx, __bss_end	
+   103 00001427 81E9[00000000]          	sub		ecx, __bss_start			; Calculo tamaño
+   104 0000142D F3AA                    	rep		stosb
+   105                                  	
+   106 0000142F 0F0115[18020000]        	lgdt	[gdtr]						; Recargo nueva GDT
+   107 00001436 0F011D[1E020000]        	lidt	[idtr]						; Cargo IDT
+   108                                  
+   109 0000143D 66B81000                	mov 	ax, DS_SEL
+   110 00001441 8ED0                    	mov 	ss, ax						; Inicializo selector de pila
+   111 00001443 BC00801400              	mov 	esp, STACK_ADDR + STACK_SIZE	; Inicializo la pila
+   112                                  
+   113 00001448 66BB2820                	mov 	bx, 0x2028					; Base de los PICS
+   114 0000144C E809000000              	call 	InitPIC						; Inicializo controlador de interrupciones
+   115                                  	
+   116 00001451 B8[00000000]            	mov 	eax, start32				; VMA de entrada
+   117 00001456 6A08                    	push 	dword CS_SEL_32
+   118 00001458 50                      	push 	eax
+   119 00001459 CB                      	retf								; Salto a main32
+   120                                  
+   121                                  ;--------------------------------------------------------------------------------
+   122                                  ; Inicializacion del controlador de interrupciones
+   123                                  ; Corre la base de los tipos de interrupción de ambos PICs 8259A de la PC a los 8 tipos consecutivos a 
+   124                                  ; partir de los valores base que recibe en BH para el PIC Nº1 y BL para el PIC Nº2.
+   125                                  ; A su retorno las Interrupciones de ambos PICs están deshabilitadas.
+   126                                  ;--------------------------------------------------------------------------------
+   127                                  InitPIC:
+   128                                  										; Inicialización PIC Nº1
+   129                                  										; ICW1
+   130 0000145A B011                    	mov		al, 11h         			; IRQs activas x flanco, cascada, y ICW4
+   131 0000145C E620                    	out     20h, al  
+   132                                  										; ICW2
+   133 0000145E 88F8                    	mov     al, bh          			; El PIC Nº1 arranca en INT tipo (BH)
+   134 00001460 E621                    	out     21h, al
+   135                                  										; ICW3
+   136 00001462 B004                    	mov     al, 04h         			; PIC1 Master, Slave ingresa Int.x IRQ2
+   137 00001464 E621                    	out     21h, al
+   138                                  										; ICW4
+   139 00001466 B001                    	mov     al, 01h         			; Modo 8086
+   140 00001468 E621                    	out     21h, al
+   141                                  										; Antes de inicializar el PIC Nº2, deshabilitamos 
+   142                                  										; las Interrupciones del PIC1
+   143 0000146A B0FF                    	mov     al, 0FFh
+   144 0000146C E621                    	out     21h, al
+   145                                  										; Ahora inicializamos el PIC Nº2
+   146                                  										; ICW1
+   147 0000146E B011                    	mov     al, 11h        			  	; IRQs activas x flanco,cascada, y ICW4
+   148 00001470 E6A0                    	out     0A0h, al  
+   149                                  										; ICW2
+   150 00001472 88D8                    	mov    	al, bl          			; El PIC Nº2 arranca en INT tipo (BL)
+   151 00001474 E6A1                    	out     0A1h, al
+   152                                  										; ICW3
+   153 00001476 B002                    	mov     al, 02h         			; PIC2 Slave, ingresa Int x IRQ2
+   154 00001478 E6A1                    	out     0A1h, al
+   155                                  										; ICW4
+   156 0000147A B001                    	mov     al, 01h         			; Modo 8086
+   157 0000147C E6A1                    	out     0A1h, al
+   158                                  										; Enmascaramos el resto de las Interrupciones 
+   159                                  										; (las del PIC Nº2)
+   160 0000147E B0FF                    	mov     al, 0FFh
+   161 00001480 E6A1                    	out     0A1h, al
+   162 00001482 C3                      	ret
+   163                                  
+   164                                  ;********************************************************************************
+   165                                  ; Tablas de sistema
+   166                                  ;********************************************************************************
+   167                                  SECTION		.sys_tables 	progbits
+   168                                  ALIGN 4
+   169                                  
+   170                                  ;--------------------------------------------------------------------------------
+   171                                  ; GDT
+   172                                  ;--------------------------------------------------------------------------------
+   173                                  GDT:
+   174                                  NULL_SEL	equ		$-GDT
+   175 00000000 0000000000000000        	dq		0x0
+   176                                  
+   177                                  CS_SEL_32   equ 	$-GDT
+   178 00000008 FFFF                    	dw 		0xFFFF 
+   179 0000000A 0000                    	dw 		0x0000
+   180 0000000C 00                      	db 		0x00
+   181 0000000D 9A                      	db 		0x9A
+   182 0000000E CF                      	db 		0xCF
+   183 0000000F 00                      	db 		0
+   184                                  		
+   185                                  DS_SEL  	equ 	$-GDT
+   186 00000010 FFFF                    	dw 		0xFFFF 
+   187 00000012 0000                    	dw 		0x0000
+   188 00000014 00                      	db 		0x00
+   189 00000015 92                      	db 		0x92
+   190 00000016 CF                      	db 		0xCF
+   191 00000017 00                      	db 		0
+   192                                  
+   193                                  GDT_LENGTH 	equ 	$-GDT
+   194                                  
+   195                                  ;--------------------------------------------------------------------------------
+   196                                  ; IDT
+   197                                  ;--------------------------------------------------------------------------------
+   198                                  IDT:
+   199 00000018 000000000000000000-     	times 	32 		dq 0,0 
+   200 00000021 00000000000000-    
+   201 00000021 <rept>             
+   202                                  		
+   203                                  IDT_LENGTH  equ 	$-IDT
+   204                                  
+   205                                  gdtr:
+   206 00000218 1700                    	dw 		GDT_LENGTH-1
+   207 0000021A [00000000]              	dd 		GDT
+   208                                  
+   209                                  idtr:
+   210 0000021E FF01                    	dw 		IDT_LENGTH-1
+   211 00000220 [18000000]              	dd 		IDT
+   212                                  
+   213                                  ;********************************************************************************
+   214                                  ; 						-  -- --- Fin de archivo --- --  -
+   215                                  ; 
+   216                                  ;********************************************************************************

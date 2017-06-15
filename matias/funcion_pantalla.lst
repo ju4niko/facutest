@@ -1,0 +1,169 @@
+     1                                  global cleansc
+     2                                  global print
+     3                                  global print2
+     4                                  global Timer_Config
+     5                                  %define 	VGA_RAM			0xB8000
+     6                                  
+     7                                  %define 	STACK_STRING 		[ebp+8]
+     8                                  %define 	STACK_COLUMNA 		[ebp+12]
+     9                                  %define 	STACK_FILA 			[ebp+16]
+    10                                  %define 	STACK_COLOR 		[ebp+20]
+    11                                  
+    12                                  SECTION .text
+    13                                  [BITS 32]
+    14                                  
+    15                                  
+    16                                  
+    17                                  
+    18                                  cleansc:
+    19 00000000 55                      	push 	ebp
+    20 00000001 89E5                    	mov 	ebp,esp
+    21 00000003 BF00800B00              	mov		edi, 0xB8000 
+    22 00000008 BE20000000              	mov		esi, " "
+    23 0000000D B9D0070000              	mov		ecx, 2000			;cantidad de caracteres totales en pantalla
+    24                                  
+    25                                  	clear:
+    26 00000012 8937                    		mov 		[edi],esi
+    27 00000014 83F900                  		cmp		ecx, 0	;me fijo si ya recorri todos los caracteres
+    28 00000017 7405                    		jz		fin_clrscr
+    29 00000019 83C702                  		add		edi, 2
+    30 0000001C E2F4                    	loop 	clear
+    31                                  
+    32                                  	fin_clrscr:
+    33 0000001E 5D                      	pop ebp
+    34 0000001F C3                      	ret
+    35                                  end_clrscr:
+    36                                  
+    37                                  
+    38                                  
+    39                                  ;*******************************************************************************
+    40                                  ; prototipo:		void print(char* string, char columna, char fila, char color)
+    41                                  ; descripcion:		escribe en pantalla
+    42                                  ;*******************************************************************************
+    43                                  ;print_pos= VGA_RAM+(2*CANT_COLUMNA)*COLUMNA+2*FILA
+    44                                  print:
+    45 00000020 55                            push ebp
+    46 00000021 89E5                          mov ebp,esp
+    47 00000023 8B7508                        mov esi,STACK_STRING	;mensaje
+    48 00000026 8B4510                        mov eax,STACK_FILA 	;eax=fila
+    49 00000029 BAA0000000                    mov edx,80*2			;edx=160
+    50 0000002E F7E2                          mul edx			  	;eax=edx*fila
+    51 00000030 8B550C                        mov edx,STACK_COLUMNA ;edx=columna
+    52 00000033 D1E2                          sal edx,1				;edx=columna*2
+    53 00000035 01D0                          add eax,edx			;eax=80*2*columna+fila*2
+    54 00000037 0500800B00                    add eax,VGA_RAM		;eax=VGA_RAM+25*columna+fila
+    55 0000003C 89C7                          mov edi,eax			;edi=VGA_RAM+25*columna+fila
+    56 0000003E 8B4514                        mov eax,STACK_COLOR	;color
+    57 00000041 88C4                          mov ah,al 			;muevo el color a la parte alta de ah
+    58                                        
+    59                                        imprimir:
+    60 00000043 8A06                    		  mov	al,[esi]
+    61 00000045 3C00                    		  cmp	al,0
+    62 00000047 7409                    		  jz 	fin_imprimir
+    63 00000049 668907                  		  mov 	[edi], ax	;ax=color,letra
+    64 0000004C 83C702                  		  add 	edi,2
+    65 0000004F 46                      		  inc 	esi
+    66 00000050 E2F1                    	  loop imprimir
+    67                                  	  
+    68                                        fin_imprimir:
+    69 00000052 5D                      	  pop ebp
+    70 00000053 C3                      	  ret
+    71                                  end_print:
+    72                                  
+    73                                  
+    74                                  
+    75                                  
+    76                                  ;++++++++++++++++++++
+    77                                  ; con pila valanceada
+    78                                  ;++++++++++++++++++++
+    79                                  
+    80                                  print2:
+    81                                  
+    82 00000054 59                      	pop		ecx		;ecx=recupero eip
+    83 00000055 5E                      	pop		esi		;esi=el mensaje
+    84 00000056 5A                      	pop		edx		;eax=columnas
+    85 00000057 58                      	pop		eax		;edx=filas
+    86 00000058 5B                      	pop 	ebx		;ebx=color
+    87 00000059 51                      	push	ecx		;recupero eip para regresar
+    88                                  
+    89 0000005A B9A0000000              	mov ecx,80*2	;ecx=160
+    90 0000005F F7E1                    	mul ecx			;eax=ecx*columnas=160*columnas
+    91                                  	
+    92 00000061 D1E2                    	sal edx,1			; ebx=filas*2
+    93 00000063 01D8                    	add eax,ebx 		;eax=160*columnas+filas*2
+    94 00000065 0500800B00              	add eax,VGA_RAM		;eax=VGA_RAM+160*columna+fila
+    95 0000006A 89C7                    	mov edi,eax			;edi=VGA_RAM+160*columna+fila
+    96 0000006C 89D8                    	mov eax,ebx			;eax=color
+    97 0000006E 88C4                    	mov ah,al 			;muevo el color a la parte alta de ah
+    98                                  
+    99                                  	imprimir2:
+   100 00000070 8A06                    		  mov	al,[esi]
+   101 00000072 3C00                    		  cmp	al,0
+   102 00000074 74DC                    		  jz 	fin_imprimir
+   103 00000076 668907                  		  mov 	[edi], ax	;ax=color,letra
+   104 00000079 83C702                  		  add 	edi,2
+   105 0000007C 46                      		  inc 	esi
+   106 0000007D E2F1                    	loop imprimir2
+   107                                  
+   108                                  	fin_imprimir2:
+   109                                  	
+   110 0000007F C3                      	  ret
+   111                                  end_print2:
+   112                                  	
+   113                                  
+   114                                  
+   115                                  ;********************************************************************************
+   116                                  ; Prototipo: void Timer_Config (void);
+   117                                  ; Uso:		 Funcion que configura el timer.
+   118                                  ; Detalles : Oscilador interno a 1.193182 MHz.
+   119                                  ;http://www.brokenthorn.com/Resources/OSDevPit.html
+   120                                  ;********************************************************************************
+   121                                  ; ## PORTS
+   122                                  TIMER_CH0_DATA 	equ 0x40 				; Channel 0 data port (read/write)
+   123                                  TIMER_CH1_DATA 	equ 0x41    			; Channel 1 data port (read/write)
+   124                                  TIMER_CH2_DATA 	equ 0x42    			; Channel 2 data port (read/write)
+   125                                  TIMER_CMD_ADDR 	equ 0x43         		; Mode/Command register (write only)
+   126                                  
+   127                                  ; ## CONFIGS
+   128                                  RATE_GENEATOR 	equ 00110100b 			; Timer con base de tiempo
+   129                                  SQWV_GENEATOR 	equ 00110110b 			; Onda cuadrada
+   130                                  
+   131                                  ; ## Frecuency
+   132                                  SYS_FREQUENCY 	equ 1193182 			; Frec in Hz
+   133                                  DESIRED_FREC 	equ 100 				; Desired Frecuency in Hz
+   134                                  FREC_DIV 		equ SYS_FREQUENCY/DESIRED_FREC
+   135                                  
+   136                                  Timer_Config:
+   137                                  
+   138 00000080 55                      	push 	ebp
+   139 00000081 89E5                    	mov 	ebp, esp 					; Acomodamos stack
+   140                                  
+   141 00000083 50                      	push 	eax 						; Salvamos registros
+   142 00000084 31C0                    	xor 	eax, eax 					; Inicializamos registros
+   143                                  
+   144                                  	Timer_Config_begin:
+   145                                  
+   146                                     ; COUNT = input hz / frequency
+   147                                   
+   148 00000086 66BA9B2E                	mov	dx, 1193180 / 100	; 100hz, or 10 milliseconds
+   149                                   
+   150                                  	; FIRST send the command word to the PIT. Sets binary counting,
+   151                                  	; Mode 3, Read or Load LSB first then MSB, Channel 0
+   152                                   
+   153 0000008A B036                    	mov	al, 110110b
+   154 0000008C E643                    	out	0x43, al
+   155                                   
+   156                                  	; Now we can write to channel 0. Because we set the "Load LSB first then MSB" bit, that is
+   157                                  	; the way we send it
+   158                                   
+   159 0000008E 6689D0                  	mov	ax, dx
+   160 00000091 E640                    	out	0x40, al	;LSB
+   161 00000093 86E0                    	xchg	ah, al
+   162 00000095 E640                    	out	0x40, al	;MSB
+   163                                  
+   164                                   	Timer_Config_end:
+   165                                  
+   166 00000097 58                          	pop eax
+   167 00000098 5D                          	pop ebp
+   168 00000099 C3                      	ret
+   169                                  
