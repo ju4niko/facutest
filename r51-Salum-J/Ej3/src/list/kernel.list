@@ -1,0 +1,68 @@
+     1                                  SECTION .kernel32 progbits
+     2                                  
+     3                                  USE32									; Codigo de 32bits
+     4                                  
+     5                                  ; Funciones externas
+     6                                  EXTERN	clrsrc
+     7                                  EXTERN	print
+     8                                  
+     9                                  GLOBAL	kernel32_init
+    10                                  
+    11                                  ; Variables
+    12 00000000 486F6C61206D756E64-     const_string	db	'Hola mundo'
+    13 00000009 6F                 
+    14 0000000A 00                      color		db	0x00
+    15                                  
+    16                                  kernel32_init:	
+    17                                  	; Preparo la pila y llamo a la funcion para limpiar la pantalla
+    18 0000000B 55                      	push	ebp
+    19 0000000C 89E5                    	mov	ebp,esp
+    20 0000000E E8(00000000)            	call	clrsrc
+    21 00000013 89EC                    	mov	esp,ebp
+    22 00000015 5D                      	pop	ebp
+    23                                  	
+    24                                  	; Preparo la pila y llamo a la funcion para escribir en pantalla
+    25 00000016 55                      	push	ebp
+    26 00000017 89E5                    	mov	ebp,esp
+    27                                  	; Cargo la pila con los parametros de la funcion para escribir la pantalla
+    28 00000019 68[0A000000]            	push	color							; Cargo el color
+    29 0000001E 6A00                    	push	0x00							; Cargo la fila donde comenzar escribir
+    30 00000020 6A00                    	push	0x00							; Cargo la columna donde comenzar a escribir
+    31 00000022 68[00000000]            	push	const_string						; Cargo el string a escribir
+    32 00000027 E8(00000000)            	call	print
+    33 0000002C 89EC                    	mov	esp,ebp
+    34 0000002E 5D                      	pop	ebp
+    35                                  
+    36                                  	;--------------------------------------------------------------------------------------------------------------------;
+    37                                  	; Generacion de los diferentes tipos de excepcion
+    38                                  
+    39                                  	; Divide Error Exception #DE
+    40                                  	;xchg	bx,bx
+    41                                  	;mov	ax,0x01
+    42                                  	;mov	bx,0x00
+    43                                  	;div	bx
+    44                                  	
+    45                                  	; Invalid Opcode Exception #UD
+    46                                  	;xchg	bx,bx
+    47                                  	;ud2
+    48                                  	
+    49                                  	; Double Fault Exception #DF
+    50                                  	;xchg	bx,bx
+    51                                  	;mov	ax,0x01
+    52                                  	;mov	bx,0x00
+    53                                  	;div	bx
+    54                                  	
+    55                                  	; General Protection Exception #GP
+    56 0000002F 6687DB                  	xchg	bx,bx
+    57 00000032 66B80000                	mov	ax,0x00
+    58 00000036 8EC8                    	mov	cs,ax
+    59                                  	
+    60                                  	; Page-Fault Exception #PF
+    61                                  	;xchg	bx,bx
+    62                                  	; Tendria que activar la paginacion primero...
+    63                                  	
+    64                                  	;--------------------------------------------------------------------------------------------------------------------;
+    65                                  	
+    66                                  ACA:									; Termino el programa
+    67 00000038 F4                      	hlt
+    68 00000039 EBFD                    	jmp ACA

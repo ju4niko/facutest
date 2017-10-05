@@ -1,0 +1,35 @@
+     1                                  SECTION .start32 progbits
+     2                                  
+     3                                  USE32									; Codigo de 32bits
+     4                                  
+     5                                  EXTERN	__STACK_END_32
+     6                                  EXTERN	__STACK_SIZE_32
+     7                                  EXTERN	CS_SEL_32
+     8                                  EXTERN	DS_SEL
+     9                                  EXTERN	kernel32_init
+    10                                  
+    11                                  GLOBAL start32_launcher
+    12                                  
+    13                                  start32_launcher:
+    14                                  	; Inicializo selectores de dato
+    15 00000000 66B8[0000]              	mov	ax,DS_SEL
+    16 00000004 8ED8                    	mov	ds,ax
+    17 00000006 8EC0                    	mov	es,ax
+    18 00000008 8EE8                    	mov 	gs, ax
+    19 0000000A 8EE0                    	mov 	fs, ax
+    20                                  
+    21                                  	; Inicializo de la pila
+    22 0000000C 8ED0                    	mov	ss,ax							; Intel recomienda luego de esta linea mover al stack pointer por si llega a haber una interrupcion
+    23                                  									; asi termina de ejecutar esta instruccion y me queda la pila completa
+    24 0000000E BC[00000000]            	mov	esp,__STACK_END_32
+    25 00000013 31C0                    	xor	eax, eax
+    26 00000015 B9[00000000]            	mov	ecx,__STACK_SIZE_32
+    27                                  
+    28                                  	; Cargo la pila con ceros
+    29                                  	.stack_init:
+    30 0000001A 50                      		push	eax
+    31 0000001B E2FD                    		loop	.stack_init
+    32                                  
+    33 0000001D BC[00000000]            	mov	esp,__STACK_END_32					; Ubico el stack pointer
+    34 00000022 EA[00000000][0000]      	jmp	CS_SEL_32:kernel32_init					; Salto al programa en modo protegido ya inicializado el procesador y los registros correctamente
+    35                                  

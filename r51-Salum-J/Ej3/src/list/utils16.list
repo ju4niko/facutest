@@ -1,0 +1,388 @@
+     1                                  GLOBAL PIC_Config
+     2                                  GLOBAL PIT_Set_1mseg
+     3                                  GLOBAL RTC_Service
+     4                                  GLOBAL A20_Enable
+     5                                  ;-------------------------------------------------------------------------------
+     6                                  ;|  Título:         Reprogramar PICS                                           |
+     7                                  ;|  Versión:        1.0                     Fecha:  15/02/2010                 |
+     8                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (16/32bits)          |
+     9                                  ;|  ------------------------------------------------------------------------   |
+    10                                  ;|  Descripción:                                                               |
+    11                                  ;|      Desplaza la base de los tipos de interrupcion de los PICs 8259A        |
+    12                                  ;|      Retorna con las interrupciones deshabilitadas                          |
+    13                                  ;|  ------------------------------------------------------------------------   |
+    14                                  ;|  Recibe:                                                                    |
+    15                                  ;|      bl:     Base del primer PIC                                            |
+    16                                  ;|      bh:     Base del segundo PIC                                           |
+    17                                  ;|                                                                             |
+    18                                  ;|  Retorna:                                                                   |
+    19                                  ;|      Nada                                                                   |
+    20                                  ;|  ------------------------------------------------------------------------   |
+    21                                  ;|  Revisiones:                                                                |
+    22                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+    23                                  ;-------------------------------------------------------------------------------
+    24                                  USE16
+    25                                  PIC_Config:                     ; Inicializo PIC 1
+    26 00000000 B011                        mov     al, 11h             ; ICW1: IRQs activas x flanco, cascada, e ICW4
+    27 00000002 E620                        out     20h, al  
+    28 00000004 88D8                        mov     al, bl              ; ICW2: El PIC 1 arranca en INT tipo "bl"
+    29 00000006 E621                        out     21h, al
+    30 00000008 B004                        mov     al, 04h             ; ICW3: PIC 1 Master, Slave, Ingresa Int x IRQ2
+    31 0000000A E621                        out     21h,al
+    32 0000000C B001                        mov     al, 01h             ; ICW4: Modo 8086
+    33 0000000E E621                        out     21h, al
+    34 00000010 B0FF                        mov     al, 0FFh            ; Deshabilito las interrupciones del PIC 1 
+    35 00000012 E621                        out     21h, al
+    36 00000014 B011                        mov     al, 11h             ; ICW1: IRQs activas x flanco, cascada, e ICW4
+    37 00000016 E6A0                        out     0A0h, al  
+    38 00000018 88F8                        mov     al, bh              ; ICW 2: El PIC 2 arranca en INT tipo "bh"
+    39 0000001A E6A1                        out     0A1h, al
+    40 0000001C B002                        mov     al, 02h             ; ICW 3: PIC 2 Slave, Ingresa Int x IRQ2
+    41 0000001E E6A1                        out     0A1h, al
+    42 00000020 B001                        mov     al, 01h             ; ICW 4: Modo 8086
+    43 00000022 E6A1                        out     0A1h, al
+    44 00000024 B0FF                        mov     al, 0FFh            ; Deshabilito las interrupciones del PIC 2
+    45 00000026 E6A1                        out     0A1h, al
+    46                                  
+    47 00000028 C3                          ret
+    48                                  
+    49                                  ;-------------------------------------------------------------------------------
+    50                                  ;|  Título:         Reprogram_PIT                                              |
+    51                                  ;|  Versión:        1.0                     Fecha:  24/08/2014                 |
+    52                                  ;|  Autor:          Andrea Pirlo            Modelo: IA-32 (16/32bits)          |
+    53                                  ;|  ------------------------------------------------------------------------   |
+    54                                  ;|  Descripción:                                                               |
+    55                                  ;|      Reprograma el Temporizador 0 del PIT (Programmable Internal Timer)     |
+    56                                  ;|      Ticks cada 1 ms                                                        |
+    57                                  ;|  ------------------------------------------------------------------------   |
+    58                                  ;|  Recibe:                                                                    |
+    59                                  ;|      Nada                                                                   |
+    60                                  ;|  Retorna:                                                                   |
+    61                                  ;|      Nada                                                                   |
+    62                                  ;|  ------------------------------------------------------------------------   |
+    63                                  ;|  Revisiones:                                                                |
+    64                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+    65                                  ;-------------------------------------------------------------------------------
+    66                                  
+    67                                  ;-------------------------------------------------------------------------------
+    68                                  ;7 6 5 4 3 2 1 0   <-- Número de bit de la palabra de control
+    69                                  ;| | | | | | | |
+    70                                  ;| | | | | | | +-- Modo BCD:
+    71                                  ;| | | | | | |     0 - El contador trabajará en formato binario de 16 bits
+    72                                  ;| | | | | | |     1 - El contador trabajará en formato BCD con cuatro dígitos 
+    73                                  ;| | | | | | |          decimales
+    74                                  ;| | | | +-+-+---- Modo de operación para el contador:
+    75                                  ;| | | |           000 - Modo 0. Interrupt on Terminal Count (Interrumpe al terminar el conteo)
+    76                                  ;| | | |           001 - Modo 1. Hardware Retriggerable One-Shot (Disparo programable)
+    77                                  ;| | | |           X10 - Modo 2. Rate Generator (Generador de impulsos). El valor del bit más significativo no importa
+    78                                  ;| | | |           X11 - Modo 3. Square Wave(Generador de onda cuadrada). El valor del bit más significativo no importa
+    79                                  ;| | | |           100 - Modo 4. Software Triggered Strobe (Strobe disparado por software)
+    80                                  ;| | | |           101 - Modo 5. Hardware Triggered Strobe (Retriggerable) (Strobe disparado por hardware)
+    81                                  ;| | | |
+    82                                  ;| | +-+---------- Modo de acceso (lectura/escritura) para el valor del contador:
+    83                                  ;| |               00 - Counter Latch. El valor puede ser leído de la manera en que fue ajustado previamente.
+    84                                  ;| |                                   El valor es mantenido hasta que es leído o sobreescrito.
+    85                                  ;| |               01 - Lee (o escribe) solo el byte menos significativo del contador (bits 0-7)
+    86                                  ;| |               10 - Lee (o escribe) solo el byte más significativo del contador (bits 8-15)
+    87                                  ;| |               11 - Primero se lee (o escribe) el byte menos significativo del contador, y luego el byte más significativo
+    88                                  ;| |
+    89                                  ;+-+-------------- Selección del contador:
+    90                                  ;                  00 - Se selecciona el contador 0
+    91                                  ;                  01 - Se selecciona el contador 1
+    92                                  ;                  10 - Se selecciona el contador 2
+    93                                  ;                  11 - No usado. (solo hay 3 contadores)
+    94                                  ;                  (Los demás bits de la palabra de control indican cómo será programado el contador seleccionado)
+    95                                  
+    96                                  USE16
+    97                                  PIT_Set_1mseg:              ; Programacion del Timer Tick.
+    98 00000029 B034                        mov al, 00110100b       
+    99 0000002B E643                        out 43h, al             ; En 43h está el registro de control.
+   100                                  
+   101 0000002D B8A904                      mov ax, 1193            ; Los 3 contadores del PIT reciben una señal de clock de 1.19318 MHz 
+   102                                                              ; 1193 * (1/1.19318 MHz) = 1000 interrupciones por segundo
+   103                                                              ; El intervalo entre interrupciones es de 1 ms.
+   104 00000030 E640                        out 40h, al             ; En 40h está el Counter 0.
+   105 00000032 88E0                        mov al, ah
+   106 00000034 E640                        out 40h, al
+   107                                  
+   108 00000036 C3                          ret
+   109                                  
+   110                                  
+   111                                  ;///////////////////////////////////////////////////////////////////////////////
+   112                                  ;                   Funciones para controlar el RTC
+   113                                  ;///////////////////////////////////////////////////////////////////////////////
+   114                                  USE16
+   115                                  
+   116                                  ;--------------------------------------------------------------------------------
+   117                                  ;|  Título:         Control RTC                                                |
+   118                                  ;|  Versión:        1.0                     Fecha:  16/07/2009                 |
+   119                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (32 bits)            |
+   120                                  ;|  ------------------------------------------------------------------------   |
+   121                                  ;|  Descripción:                                                               |
+   122                                  ;|      Rutina para manejo de servicios del Reloj de Tiempo Real               |
+   123                                  ;|  ------------------------------------------------------------------------   |
+   124                                  ;|  Recibe:                                                                    |
+   125                                  ;|      AL = 0 Subfuncion fecha                                                |
+   126                                  ;|      AL = 1 Subfuncion hora                                                 |
+   127                                  ;|                                                                             |
+   128                                  ;|  Retorna:                                                                   |
+   129                                  ;|      Fecha:                                                                 |
+   130                                  ;|          DH = Año                                                           |
+   131                                  ;|          DL = Mes                                                           |
+   132                                  ;|          AH = Dia                                                           |
+   133                                  ;|          AL = Dia de la semana                                              |
+   134                                  ;|      Hora:                                                                  |
+   135                                  ;|          DL = Hora                                                          |
+   136                                  ;|          AH = Minutos                                                       |
+   137                                  ;|          AL = Segundos                                                      |
+   138                                  ;|          CL = 0:OK  N:Codigo de error                                       |
+   139                                  ;|  ------------------------------------------------------------------------   |
+   140                                  ;|  Revisiones:                                                                |
+   141                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   142                                  ;-------------------------------------------------------------------------------
+   143                                  RTC_Service:
+   144 00000037 3C00                        cmp     al, 0
+   145 00000039 7427                        je      Fecha               ; Servicio de Fecha
+   146 0000003B 3C01                        cmp     al, 1
+   147 0000003D 7408                        je      Hora                ; Servicio de Hora
+   148 0000003F EB00                        jmp     RTC_Err_Exit        ; Funcion no valida, salida con error
+   149                                      
+   150                                  RTC_Err_Exit:
+   151 00000041 B101                        mov     cl, 1               ; Codigo de error. Subfuncion invalida
+   152 00000043 C3                          ret
+   153                                  RTC_Exit:
+   154 00000044 B100                        mov     cl, 0               ; Codigo de error. OK
+   155 00000046 C3                          ret
+   156                                  
+   157                                  ;-------------------------------------------------------------------------------
+   158                                  ;|  Título:         Auxiliar RTC                                               |
+   159                                  ;|  Versión:        1.0                     Fecha:  16/07/2009                 |
+   160                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (32 bits)            |
+   161                                  ;|  ------------------------------------------------------------------------   |
+   162                                  ;|  Descripción:                                                               |
+   163                                  ;|      Subfuncion para obtener la hora del sistema desde el RTC               |
+   164                                  ;|  ------------------------------------------------------------------------   |
+   165                                  ;|  Recibe:                                                                    |
+   166                                  ;|      Nada                                                                   |
+   167                                  ;|  Retorna:                                                                   |
+   168                                  ;|      Nada                                                                   |
+   169                                  ;|  ------------------------------------------------------------------------   |
+   170                                  ;|  Revisiones:                                                                |
+   171                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   172                                  ;-------------------------------------------------------------------------------
+   173                                  Hora:
+   174 00000047 E83B00                      call    RTC_disponible      ; asegura que no está actualizándose el RTC
+   175 0000004A B004                        mov     al, 4
+   176 0000004C E670                        out     70h, al             ; Selecciona Registro de Hora
+   177 0000004E E471                        in      al, 71h             ; lee hora
+   178 00000050 88C2                        mov     dl, al
+   179                                  
+   180 00000052 B002                        mov     al, 2
+   181 00000054 E670                        out     70h, al             ; Selecciona Registro de Minutos
+   182 00000056 E471                        in      al, 71h             ; lee minutos
+   183 00000058 88C4                        mov     ah, al
+   184                                  
+   185 0000005A 30C0                        xor     al, al
+   186 0000005C E670                        out     70h, al             ; Selecciona Registro de Segundos
+   187 0000005E E471                        in      al, 71h             ; lee minutos
+   188                                  
+   189 00000060 EBE2                        jmp     RTC_Exit
+   190                                  
+   191                                  
+   192                                  ;-------------------------------------------------------------------------------
+   193                                  ;|  Título:         Auxiliar RTC                                               |
+   194                                  ;|  Versión:        1.0                     Fecha:  16/07/2009                 |
+   195                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (32 bits)            |
+   196                                  ;|  ------------------------------------------------------------------------   |
+   197                                  ;|  Descripción:                                                               |
+   198                                  ;|      Subfuncion para obtener la fecha del sistema desde el RTC              |
+   199                                  ;|  ------------------------------------------------------------------------   |
+   200                                  ;|  Recibe:                                                                    |
+   201                                  ;|      Nada                                                                   |
+   202                                  ;|  Retorna:                                                                   |
+   203                                  ;|      Nada                                                                   |
+   204                                  ;|  ------------------------------------------------------------------------   |
+   205                                  ;|  Revisiones:                                                                |
+   206                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   207                                  ;-------------------------------------------------------------------------------
+   208                                  Fecha:
+   209 00000062 E82000                      call    RTC_disponible      ; asegura que no esté 
+   210                                                                  ; actualizandose el RTC
+   211 00000065 B009                        mov     al, 9
+   212 00000067 E670                        out     70h, al             ; Selecciona Registro de Año
+   213 00000069 E471                        in      al, 71h             ; lee año 
+   214 0000006B 88C6                        mov     dh, al
+   215                                  
+   216 0000006D B008                        mov     al, 8
+   217 0000006F E670                        out     70h, al             ; Selecciona Registro de Mes
+   218 00000071 E471                        in      al, 71h             ; lee mes
+   219 00000073 88C2                        mov     dl, al
+   220                                  
+   221 00000075 B007                        mov     al, 7
+   222 00000077 E670                        out     70h, al             ; Selecciona Registro de Fecha
+   223 00000079 E471                        in      al, 71h             ; lee Fecha del mes
+   224 0000007B 88C4                        mov     ah, al
+   225                                  
+   226 0000007D B006                        mov     al, 6
+   227 0000007F E670                        out     70h, al             ; Selecciona Registro de Día 
+   228 00000081 E471                        in      al, 71h             ; lee día de la semana
+   229                                  
+   230 00000083 EBBF                        jmp     RTC_Exit
+   231                                  
+   232                                      
+   233                                  ;-------------------------------------------------------------------------------
+   234                                  ;|  Título:         Auxiliar RTC                                               |
+   235                                  ;|  Versión:        1.0                     Fecha:  16/07/2009                 |
+   236                                  ;|  Autor:          D.GARCIA                Modelo: IA-32e (64 bits)           |
+   237                                  ;|  ------------------------------------------------------------------------   |
+   238                                  ;|  Descripción:                                                               |
+   239                                  ;|      Verifica en el Status Register A que el RTC no esta actualizando       |
+   240                                  ;|      fecha y hora.                                                          |
+   241                                  ;|      Retorna cuando el RTC esta disponible                                  |
+   242                                  ;|  ------------------------------------------------------------------------   |
+   243                                  ;|  Recibe:                                                                    |
+   244                                  ;|      Nada                                                                   |
+   245                                  ;|  Retorna:                                                                   |
+   246                                  ;|      Nada                                                                   |
+   247                                  ;|  ------------------------------------------------------------------------   |
+   248                                  ;|  Revisiones:                                                                |
+   249                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   250                                  ;-------------------------------------------------------------------------------
+   251                                  RTC_disponible:
+   252 00000085 B00A                        mov     al, 0Ah
+   253 00000087 E670                        out     70h, al             ; Selecciona registro de status A
+   254                                  wait_for_free:
+   255 00000089 E471                        in      al, 71h             ; lee Status
+   256 0000008B A880                        test    al, 80h
+   257 0000008D 75FA                        jnz     wait_for_free
+   258                                      
+   259 0000008F C3                          ret
+   260                                  
+   261                                  
+   262                                  ;///////////////////////////////////////////////////////////////////////////////
+   263                                  ;                   Funciones para habilitar el A20 Gate
+   264                                  ;///////////////////////////////////////////////////////////////////////////////
+   265                                  %define     PORT_A_8042     0x60        ; Puerto A de E/S del 8042
+   266                                  %define     CTRL_PORT_8042  0x64        ; Puerto de Estado del 8042
+   267                                  USE16
+   268                                  ;-------------------------------------------------------------------------------
+   269                                  ;|  Título: Habilito Gate A20                                                  |
+   270                                  ;|  Versión:        1.0                     Fecha:  15/02/2010                 |
+   271                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (16/32bits)          |
+   272                                  ;|  ------------------------------------------------------------------------   |
+   273                                  ;|  Descripción:                                                               |
+   274                                  ;|      Chequea y llama a la funcion de habilitacion de la puerta A20 si no    |
+   275                                  ;|      esta habilitada                                                        |
+   276                                  ;|  ------------------------------------------------------------------------   |
+   277                                  ;|  Recibe:                                                                    |
+   278                                  ;|      Nada                                                                   |
+   279                                  ;|                                                                             |
+   280                                  ;|  Retorna:                                                                   |
+   281                                  ;|      Nada                                                                   |
+   282                                  ;|  ------------------------------------------------------------------------   |
+   283                                  ;|  Revisiones:                                                                |
+   284                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   285                                  ;-------------------------------------------------------------------------------
+   286                                  
+   287                                  A20_Enable:
+   288 00000090 B8FFFF                      mov     ax, 0FFFFh      
+   289 00000093 8EC0                        mov     es, ax
+   290 00000095 26813E0E7E55AA              cmp     word [es:7E0Eh], 0AA55h ; Chequeo si 107E0Eh coincide con 7E0Eh
+   291 0000009C 740D                        je      GateA20_Disabled        ; A20 esta deshabilitada si coincide
+   292 0000009E D106FE7D                    rol     word [7DFEh], 1h        ; Modifico word en 7E0Eh
+   293 000000A2 26813E0E7EAA55              cmp     word [es:7E0Eh], 55AAh  ; Cambio tambien 107E0Eh?
+   294 000000A9 750C                        jne     GateA20_Enabled         ; Si no cambio entonces A20 esta habilitada
+   295                                  GateA20_Disabled:
+   296 000000AB B0DF                        mov     al, 0DFh                ; Comando de habilitacion de A20
+   297 000000AD E80E00                      call    _Gate_A20               ; Habilitar Gate A20
+   298 000000B0 3C00                        cmp     al, 0                   ; OK?
+   299 000000B2 7403                        je      GateA20_Enabled         ; Si es OK continuo
+   300                                  Fail:
+   301 000000B4 F4                          hlt                             ; De lo contrario detengo el procesador
+   302 000000B5 EBFD                        jmp     Fail
+   303                                  GateA20_Enabled:
+   304 000000B7 C706FE7D55AA                mov     word [7DFEh], 0AA55h    ; Restituyo la firma del bootloader
+   305                                  
+   306 000000BD C3                          ret
+   307                                  
+   308                                  ;-------------------------------------------------------------------------------
+   309                                  ;|  Título: Auxiliar para habilitar Gate A20                                   |
+   310                                  ;|  Versión:        1.0                     Fecha:  15/02/2010                 |
+   311                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (16/32bits)          |
+   312                                  ;|  ------------------------------------------------------------------------   |
+   313                                  ;|  Descripción:                                                               |
+   314                                  ;|      Controla la señal que maneja la compuerta del bit de direcciones A20.  |
+   315                                  ;|      La señal de compuerta del bit A20 toma una salida del procesador de    |
+   316                                  ;|      teclado 8042.                                                          |
+   317                                  ;|      Se debe utilizar cuando se planea acceder en Modo Protegido a          |
+   318                                  ;|      direcciones de memoria mas alla del 1er Mbyte                          |
+   319                                  ;|      El port 60h como entrada lee el scan code de la última tecla presionada|
+   320                                  ;|      o liberada por el operador de la PC. Como salida tiene funciones muy   |
+   321                                  ;|      específicas bit a bit: En particular el Bit 1 se utiliza para activar  |
+   322                                  ;|      el Gate de A20 si se pone en 1 y desactivarlo si está en 0.            |
+   323                                  ;|      Por otra parte el port 64h es el registro de comandos/estados según se |
+   324                                  ;|      escriba o lea respectivamente.                                         |
+   325                                  ;|      En BIOS nuevos aparece la INT 15h con ax 2400 disable, o 2401 enable   |
+   326                                  ;|  ------------------------------------------------------------------------   |
+   327                                  ;|  Recibe:                                                                    |
+   328                                  ;|      AH = 0DDh, si se desea apagar esta senal                               |
+   329                                  ;|      AL = 0DFh, si se desea disparar esta senal (x86 controla A20)          |
+   330                                  ;|                                                                             |
+   331                                  ;|  Retorna:                                                                   |
+   332                                  ;|      AL = 00, si hubo exito. El 8042 acepto el comando                      |
+   333                                  ;|      AL = 02, si fallo. El 8042 no acepto el comando                        |
+   334                                  ;|  ------------------------------------------------------------------------   |
+   335                                  ;|  Revisiones:                                                                |
+   336                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   337                                  ;-------------------------------------------------------------------------------
+   338                                  
+   339                                  _Gate_A20:
+   340 000000BE FA                          cli                         ; Deshabilito interrupciones en el uso del 8042
+   341                                  
+   342 000000BF E81300                      call    _8042_empty?        ; Ve si el buffer del 8042 está vacío
+   343 000000C2 7510                        jnz     gate_a20_exit       ; No lo está => retorna con AL=2
+   344                                  
+   345 000000C4 B0D1                        mov     al, 0D1h            ; Comando Write port del 8042
+   346 000000C6 E664                        out     CTRL_PORT_8042, al  ; ...se envia al port 64h
+   347                                  
+   348 000000C8 E80A00                      call    _8042_empty?        ; Espera se acepte el comando
+   349 000000CB 7507                        jnz     gate_a20_exit       ; Si no se acepta, retorna con AL=2
+   350                                  
+   351 000000CD 88E0                        mov     al, ah              ; Pone en AL el dato a escribir
+   352 000000CF E660                        out     PORT_A_8042, al     ; Lo envia al 8042
+   353 000000D1 E80100                      call    _8042_empty?        ; Espera se acepte el comando
+   354                                  
+   355                                  gate_a20_exit:
+   356 000000D4 C3                          ret
+   357                                  
+   358                                  
+   359                                  ;-------------------------------------------------------------------------------
+   360                                  ;|  Título: Auxiliar para habilitar Gate A20                                   |
+   361                                  ;|  Versión:        1.0                     Fecha:  15/02/2010                 |
+   362                                  ;|  Autor:          D.GARCIA                Modelo: IA-32 (16/32bits)          |
+   363                                  ;|  ------------------------------------------------------------------------   |
+   364                                  ;|  Descripción:                                                               |
+   365                                  ;|      Espera que se vacie el buffer del 8042                                 |
+   366                                  ;|  ------------------------------------------------------------------------   |
+   367                                  ;|  Recibe:                                                                    |
+   368                                  ;|      Nada                                                                   |
+   369                                  ;|                                                                             |
+   370                                  ;|  Retorna:                                                                   |
+   371                                  ;|      AL = 00, el buffer del 8042 est  vacio.(ZF = 1)                        |
+   372                                  ;|      AL = 02, time out. El buffer del 8042 sigue lleno. (ZF = 0)            |
+   373                                  ;|  ------------------------------------------------------------------------   |
+   374                                  ;|  Revisiones:                                                                |
+   375                                  ;|      1.0 | 15/02/2010 | D.GARCIA | Original                                 |
+   376                                  ;-------------------------------------------------------------------------------
+   377                                  
+   378                                  _8042_empty?:
+   379 000000D5 51                          push    cx                  ; Salva CX
+   380 000000D6 29C9                        sub     cx, cx              ; CX = 0 : valor de time out
+   381                                  empty_8042_01:  
+   382 000000D8 E464                        in      al, CTRL_PORT_8042  ; Lee port de estado del 8042
+   383 000000DA 2402                        and     al, 00000010b       ; si el bit 1 esta seteado o...
+   384 000000DC E0FA                        loopnz  empty_8042_01       ; no alcanzó time out, espera.
+   385 000000DE 59                          pop     cx                  ; recupera cx
+   386 000000DF C3                          ret                         ; retorna con AL=0, si se limpió bit 1, 
+   387                                                                  ; o AL=2 si no. 
+   388                                  

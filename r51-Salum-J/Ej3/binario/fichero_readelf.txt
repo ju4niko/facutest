@@ -1,0 +1,211 @@
+Encabezado ELF:
+  Mágico:   7f 45 4c 46 01 01 01 00 00 00 00 00 00 00 00 00 
+  Clase:                             ELF32
+  Datos:                             complemento a 2, little endian
+  Versión:                           1 (current)
+  OS/ABI:                            UNIX - System V
+  Versión ABI:                       0
+  Tipo:                              EXEC (Fichero ejecutable)
+  Máquina:                           Intel 80386
+  Versión:                           0x1
+  Dirección del punto de entrada:               0xf800
+  Inicio de encabezados de programa:          52 (bytes en el fichero)
+  Inicio de encabezados de sección:          20312 (bytes en el fichero)
+  Opciones:                          0x0
+  Tamaño de este encabezado:         52 (bytes)
+  Tamaño de encabezados de programa: 32 (bytes)
+  Número de encabezados de programa: 5
+  Tamaño de encabezados de sección:  40 (bytes)
+  Número de encabezados de sección:  14
+  Índice de tabla de cadenas de sección de encabezado: 11
+
+Encabezados de Sección:
+  [Nr] Nombre            Tipo            Direc    Desp   Tam    ES Opt En Inf Al
+  [ 0]                   NULL            00000000 000000 000000 00      0   0  0
+  [ 1] .codigo_kernel32  PROGBITS        ffff0000 001000 0000ff 00  AX  0   0  1
+  [ 2] .codigo_idt_ctrlr PROGBITS        00020000 002000 000605 00   A  0   0 32
+  [ 3] .codigo32         PROGBITS        0000f000 003000 00064a 00  AX  0   0  1
+  [ 4] .text             PROGBITS        0000f650 003650 0000e0 00  AX  0   0 16
+  [ 5] .codigo16         PROGBITS        0000f800 003800 000026 00   A  0   0  1
+  [ 6] .tablas           PROGBITS        0000fd00 003d00 000026 00   A  0   0  1
+  [ 7] .codigo_reset     PROGBITS        0000fff0 003ff0 000005 00   A  0   0  1
+  [ 8] .fill_rom16       PROGBITS        0000fff5 003ff5 00000a 00  WA  0   0  1
+  [ 9] .end_rom16        PROGBITS        0000ffff 003fff 000001 00  WA  0   0  1
+  [10] .comment          PROGBITS        00000000 004000 000034 01  MS  0   0  1
+  [11] .shstrtab         STRTAB          00000000 004ec8 00008f 00      0   0  1
+  [12] .symtab           SYMTAB          00000000 004034 0008c0 10     13  71  4
+  [13] .strtab           STRTAB          00000000 0048f4 0005d4 00      0   0  1
+Clave para Opciones:
+  W (escribir), A (asignar), X (ejecutar), M (mezclar), S (cadenas)
+  I (info), L (orden enlazado), G (grupo), T (TLS), E (excluir)
+  x (desconocido), O (se requiere procesamiento extra del SO)
+  o (específico del SO), p (específico del procesador)
+
+No hay grupos de sección en este fichero.
+
+Encabezados de Programa:
+  Tipo           Desplaz  DirVirt    DirFísica  TamFich TamMem  Opt Alin
+  LOAD           0x001000 0xffff0000 0xffff0000 0x000ff 0x000ff R E 0x1000
+  LOAD           0x002000 0x00020000 0xffff00ff 0x00605 0x00605 R   0x1000
+  LOAD           0x003000 0x0000f000 0xfffff000 0x00fff 0x00fff RWE 0x1000
+  LOAD           0x003fff 0x0000ffff 0xffffffff 0x00001 0x00001 RW  0x1000
+  GNU_STACK      0x000000 0x00000000 0x00000000 0x00000 0x00000 RWE 0x10
+
+ mapeo de Sección a Segmento:
+  Segmento Secciones...
+   00     .codigo_kernel32 
+   01     .codigo_idt_ctrlrs 
+   02     .codigo32 .text .codigo16 .tablas .codigo_reset .fill_rom16 
+   03     .end_rom16 
+   04     
+
+No hay sección dinámica en este fichero.
+
+No hay reubicaciones en este fichero.
+
+The decoding of unwind sections for machine type Intel 80386 is not currently supported.
+
+La tabla de símbolos '.symtab' contiene 140 entradas:
+   Num:    Valor  Tam  Tipo    Unión  Vis      Nombre Ind
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND 
+     1: ffff0000     0 SECTION LOCAL  DEFAULT    1 
+     2: 00020000     0 SECTION LOCAL  DEFAULT    2 
+     3: 0000f000     0 SECTION LOCAL  DEFAULT    3 
+     4: 0000f650     0 SECTION LOCAL  DEFAULT    4 
+     5: 0000f800     0 SECTION LOCAL  DEFAULT    5 
+     6: 0000fd00     0 SECTION LOCAL  DEFAULT    6 
+     7: 0000fff0     0 SECTION LOCAL  DEFAULT    7 
+     8: 0000fff5     0 SECTION LOCAL  DEFAULT    8 
+     9: 0000ffff     0 SECTION LOCAL  DEFAULT    9 
+    10: 00000000     0 SECTION LOCAL  DEFAULT   10 
+    11: 00000000     0 FILE    LOCAL  DEFAULT  ABS funciones_pantalla.c
+    12: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/kernel.s
+    13: ffff00c4     0 NOTYPE  LOCAL  DEFAULT    1 const_string
+    14: ffff00ce     0 NOTYPE  LOCAL  DEFAULT    1 color
+    15: ffff00fc     0 NOTYPE  LOCAL  DEFAULT    1 ACA
+    16: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/handlers_asm32.s
+    17: 00020000     0 NOTYPE  LOCAL  DEFAULT    2 ex_num0
+    18: 00020015     0 NOTYPE  LOCAL  DEFAULT    2 ex_num1
+    19: 0002002a     0 NOTYPE  LOCAL  DEFAULT    2 ex_num2
+    20: 0002003f     0 NOTYPE  LOCAL  DEFAULT    2 ex_num3
+    21: 00020054     0 NOTYPE  LOCAL  DEFAULT    2 ex_num4
+    22: 00020069     0 NOTYPE  LOCAL  DEFAULT    2 ex_num5
+    23: 0002007e     0 NOTYPE  LOCAL  DEFAULT    2 ex_num6
+    24: 00020093     0 NOTYPE  LOCAL  DEFAULT    2 ex_num7
+    25: 000200a8     0 NOTYPE  LOCAL  DEFAULT    2 ex_num8
+    26: 000200bd     0 NOTYPE  LOCAL  DEFAULT    2 ex_num10
+    27: 000200d3     0 NOTYPE  LOCAL  DEFAULT    2 ex_num11
+    28: 000200e9     0 NOTYPE  LOCAL  DEFAULT    2 ex_num12
+    29: 000200ff     0 NOTYPE  LOCAL  DEFAULT    2 ex_num13
+    30: 00020115     0 NOTYPE  LOCAL  DEFAULT    2 ex_num14
+    31: 0002012b     0 NOTYPE  LOCAL  DEFAULT    2 ex_num16
+    32: 00020141     0 NOTYPE  LOCAL  DEFAULT    2 ex_num17
+    33: 00020157     0 NOTYPE  LOCAL  DEFAULT    2 ex_num18
+    34: 0002016d     0 NOTYPE  LOCAL  DEFAULT    2 ex_num19
+    35: 00020183     0 NOTYPE  LOCAL  DEFAULT    2 ex_num20
+    36: 00020199     0 NOTYPE  LOCAL  DEFAULT    2 color
+    37: 0002019a     0 NOTYPE  LOCAL  DEFAULT    2 dummy_entry
+    38: 000201a2     0 NOTYPE  LOCAL  DEFAULT    2 FIN
+    39: 000201a5     0 NOTYPE  LOCAL  DEFAULT    2 HANDLERS_IDT_START
+    40: 00000460     0 NOTYPE  LOCAL  DEFAULT  ABS EXCEPTION_DUMMY
+    41: 00000000     0 FILE    LOCAL  DEFAULT  ABS funciones_idt.c
+    42: 0000f000    12 FUNC    LOCAL  DEFAULT    3 __lidt
+    43: 00000000     0 FILE    LOCAL  DEFAULT  ABS funciones_memoria.c
+    44: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/start32.s
+    45: 0000f14c     0 NOTYPE  LOCAL  DEFAULT    3 start32_launcher.stack_in
+    46: 0000f187     0 NOTYPE  LOCAL  DEFAULT    3 fin_inic_excepciones
+    47: 0000f18e     0 NOTYPE  LOCAL  DEFAULT    3 finalizo_programa
+    48: 0000f191     0 NOTYPE  LOCAL  DEFAULT    3 inicializo_excepciones
+    49: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/utils16.s
+    50: 0000f691     0 NOTYPE  LOCAL  DEFAULT    4 RTC_Err_Exit
+    51: 0000f694     0 NOTYPE  LOCAL  DEFAULT    4 RTC_Exit
+    52: 0000f697     0 NOTYPE  LOCAL  DEFAULT    4 Hora
+    53: 0000f6b2     0 NOTYPE  LOCAL  DEFAULT    4 Fecha
+    54: 0000f6d5     0 NOTYPE  LOCAL  DEFAULT    4 RTC_disponible
+    55: 0000f6d9     0 NOTYPE  LOCAL  DEFAULT    4 wait_for_free
+    56: 0000f6fb     0 NOTYPE  LOCAL  DEFAULT    4 GateA20_Disabled
+    57: 0000f704     0 NOTYPE  LOCAL  DEFAULT    4 Fail
+    58: 0000f707     0 NOTYPE  LOCAL  DEFAULT    4 GateA20_Enabled
+    59: 0000f70e     0 NOTYPE  LOCAL  DEFAULT    4 _Gate_A20
+    60: 0000f724     0 NOTYPE  LOCAL  DEFAULT    4 gate_a20_exit
+    61: 0000f725     0 NOTYPE  LOCAL  DEFAULT    4 _8042_empty?
+    62: 0000f728     0 NOTYPE  LOCAL  DEFAULT    4 empty_8042_01
+    63: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/start16.s
+    64: 0000f81d     0 NOTYPE  LOCAL  DEFAULT    5 flush_prefetch_queue
+    65: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/tablas.s
+    66: 0000fd00     0 NOTYPE  LOCAL  DEFAULT    6 GDT
+    67: 00000000     0 NOTYPE  LOCAL  DEFAULT  ABS NULL_SEL
+    68: 00000020     0 NOTYPE  LOCAL  DEFAULT  ABS GDT_LENGHT
+    69: 00000000     0 FILE    LOCAL  DEFAULT  ABS src/reset.s
+    70: 0000fff0     0 NOTYPE  LOCAL  DEFAULT    7 reset_inic
+    71: 00020200     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_NMI
+    72: 00020460     0 NOTYPE  GLOBAL DEFAULT    2 INT_2
+    73: 00020240     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_OF
+    74: 000202a0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_NM
+    75: ffff0035   143 FUNC    GLOBAL DEFAULT    1 print
+    76: 00020300     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_NP
+    77: 0000f00c   116 FUNC    GLOBAL DEFAULT    3 __init_idt
+    78: 00000018     0 NOTYPE  GLOBAL DEFAULT  ABS DS_SEL
+    79: 00020420     0 NOTYPE  GLOBAL DEFAULT    2 INT_0
+    80: 0000f679     0 NOTYPE  GLOBAL DEFAULT    4 PIT_Set_1mseg
+    81: 000202c0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_DF
+    82: 00070000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_32
+    83: 000201e0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_DB
+    84: 000205c0     0 NOTYPE  GLOBAL DEFAULT    2 INT_13
+    85: 00020320     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_SS
+    86: 00020580     0 NOTYPE  GLOBAL DEFAULT    2 INT_11
+    87: 00020480     0 NOTYPE  GLOBAL DEFAULT    2 INT_3
+    88: 0000f000     0 NOTYPE  GLOBAL DEFAULT  ABS vma_inic32
+    89: 000202e0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_TS
+    90: 00020000     0 NOTYPE  GLOBAL DEFAULT  ABS ___idt_ctrlrs_vma_st
+    91: 000203e0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_XM
+    92: 00009000     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_START_16
+    93: 0000f800     0 NOTYPE  GLOBAL DEFAULT    5 start16_inic
+    94: 0000fff0     0 NOTYPE  GLOBAL DEFAULT  ABS vma_reset
+    95: ffff00cf     0 NOTYPE  GLOBAL DEFAULT    1 kernel32_init
+    96: 0007ffff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_32
+    97: 0000f0f6    60 FUNC    GLOBAL DEFAULT    3 __fast_memcpy
+    98: 00000010     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_32
+    99: 00020220     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_BP
+   100: ffff00ff     0 NOTYPE  GLOBAL DEFAULT  ABS ___idt_ctrlrs_lma_st
+   101: 0000fd00     0 NOTYPE  GLOBAL DEFAULT  ABS vma_datos
+   102: 00020260     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_BR
+   103: 000204a0     0 NOTYPE  GLOBAL DEFAULT    2 INT_4
+   104: 000205e0     0 NOTYPE  GLOBAL DEFAULT    2 INT_14
+   105: 00020280     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_UD
+   106: 0000f080   118 FUNC    GLOBAL DEFAULT    3 __set_idt_entry
+   107: 00003fff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_SIZE_32
+   108: 000205a0     0 NOTYPE  GLOBAL DEFAULT    2 INT_12
+   109: 0000ffff     0 NOTYPE  GLOBAL DEFAULT  ABS __STACK_END_16
+   110: 00020540     0 NOTYPE  GLOBAL DEFAULT    2 INT_9
+   111: 00000008     0 NOTYPE  GLOBAL DEFAULT  ABS CS_SEL_16
+   112: 0000fd20     0 NOTYPE  GLOBAL DEFAULT    6 GDTR
+   113: 000203a0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_AC
+   114: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND __handlers_32_01l
+   115: 0000f650     0 NOTYPE  GLOBAL DEFAULT    4 PIC_Config
+   116: 000204e0     0 NOTYPE  GLOBAL DEFAULT    2 INT_6
+   117: ffff0000    53 FUNC    GLOBAL DEFAULT    1 clrsrc
+   118: 00000605     0 NOTYPE  GLOBAL DEFAULT  ABS ___idt_ctrlrs_size
+   119: 00020520     0 NOTYPE  GLOBAL DEFAULT    2 INT_8
+   120: 00020360     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_PF
+   121: 00000000     0 NOTYPE  GLOBAL DEFAULT  ABS __IDT_START
+   122: 000201c0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_DE
+   123: 000204c0     0 NOTYPE  GLOBAL DEFAULT    2 INT_5
+   124: 00020340     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_GP
+   125: 00020560     0 NOTYPE  GLOBAL DEFAULT    2 INT_10
+   126: 00000100     0 NOTYPE  GLOBAL DEFAULT  ABS __IDT_ENTRIES
+   127: 00020400     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_VE
+   128: 0000f6e0     0 NOTYPE  GLOBAL DEFAULT    4 A20_Enable
+   129: 0000f687     0 NOTYPE  GLOBAL DEFAULT    4 RTC_Service
+   130: 00000800     0 NOTYPE  GLOBAL DEFAULT  ABS __IDT_END
+   131: 00020600     0 NOTYPE  GLOBAL DEFAULT    2 INT_15
+   132: 00020380     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_MF
+   133: 0000f800     0 NOTYPE  GLOBAL DEFAULT  ABS vma_inic16
+   134: 00020440     0 NOTYPE  GLOBAL DEFAULT    2 INT_1
+   135: 00020500     0 NOTYPE  GLOBAL DEFAULT    2 INT_7
+   136: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND __handlers_32h
+   137: ffff0000     0 NOTYPE  GLOBAL DEFAULT  ABS vma_kernel32
+   138: 0000f132     0 NOTYPE  GLOBAL DEFAULT    3 start32_launcher
+   139: 000203c0     0 NOTYPE  GLOBAL DEFAULT    2 EXCEPTION_MC
+
+No se encontró información de versión en este fichero.

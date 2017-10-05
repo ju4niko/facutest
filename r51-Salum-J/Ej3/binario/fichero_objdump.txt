@@ -1,0 +1,1118 @@
+
+binario/fichero.elf:     formato del fichero elf32-i386
+binario/fichero.elf
+arquitectura: i386, opciones 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+dirección de inicio 0x0000f800
+
+Encabezado del Programa:
+    LOAD off    0x00001000 vaddr 0xffff0000 paddr 0xffff0000 align 2**12
+         filesz 0x000000ff memsz 0x000000ff flags r-x
+    LOAD off    0x00002000 vaddr 0x00020000 paddr 0xffff00ff align 2**12
+         filesz 0x00000605 memsz 0x00000605 flags r--
+    LOAD off    0x00003000 vaddr 0x0000f000 paddr 0xfffff000 align 2**12
+         filesz 0x00000fff memsz 0x00000fff flags rwx
+    LOAD off    0x00003fff vaddr 0x0000ffff paddr 0xffffffff align 2**12
+         filesz 0x00000001 memsz 0x00000001 flags rw-
+   STACK off    0x00000000 vaddr 0x00000000 paddr 0x00000000 align 2**4
+         filesz 0x00000000 memsz 0x00000000 flags rwx
+
+Secciones:
+Ind Nombre        Tamaño    VMA       LMA       Desp fich Alin
+  0 .codigo_kernel32 000000ff  ffff0000  ffff0000  00001000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .codigo_idt_ctrlrs 00000605  00020000  ffff00ff  00002000  2**5
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .codigo32     0000064a  0000f000  fffff000  00003000  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  3 .text         000000e0  0000f650  fffff650  00003650  2**4
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  4 .codigo16     00000026  0000f800  fffff800  00003800  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  5 .tablas       00000026  0000fd00  fffffd00  00003d00  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  6 .codigo_reset 00000005  0000fff0  fffffff0  00003ff0  2**0
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  7 .fill_rom16   0000000a  0000fff5  fffffff5  00003ff5  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  8 .end_rom16    00000001  0000ffff  ffffffff  00003fff  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  9 .comment      00000034  00000000  00000000  00004000  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+ffff0000 l    d  .codigo_kernel32	00000000 .codigo_kernel32
+00020000 l    d  .codigo_idt_ctrlrs	00000000 .codigo_idt_ctrlrs
+0000f000 l    d  .codigo32	00000000 .codigo32
+0000f650 l    d  .text	00000000 .text
+0000f800 l    d  .codigo16	00000000 .codigo16
+0000fd00 l    d  .tablas	00000000 .tablas
+0000fff0 l    d  .codigo_reset	00000000 .codigo_reset
+0000fff5 l    d  .fill_rom16	00000000 .fill_rom16
+0000ffff l    d  .end_rom16	00000000 .end_rom16
+00000000 l    d  .comment	00000000 .comment
+00000000 l    df *ABS*	00000000 funciones_pantalla.c
+00000000 l    df *ABS*	00000000 src/kernel.s
+ffff00c4 l       .codigo_kernel32	00000000 const_string
+ffff00ce l       .codigo_kernel32	00000000 color
+ffff00fc l       .codigo_kernel32	00000000 ACA
+00000000 l    df *ABS*	00000000 src/handlers_asm32.s
+00020000 l       .codigo_idt_ctrlrs	00000000 ex_num0
+00020015 l       .codigo_idt_ctrlrs	00000000 ex_num1
+0002002a l       .codigo_idt_ctrlrs	00000000 ex_num2
+0002003f l       .codigo_idt_ctrlrs	00000000 ex_num3
+00020054 l       .codigo_idt_ctrlrs	00000000 ex_num4
+00020069 l       .codigo_idt_ctrlrs	00000000 ex_num5
+0002007e l       .codigo_idt_ctrlrs	00000000 ex_num6
+00020093 l       .codigo_idt_ctrlrs	00000000 ex_num7
+000200a8 l       .codigo_idt_ctrlrs	00000000 ex_num8
+000200bd l       .codigo_idt_ctrlrs	00000000 ex_num10
+000200d3 l       .codigo_idt_ctrlrs	00000000 ex_num11
+000200e9 l       .codigo_idt_ctrlrs	00000000 ex_num12
+000200ff l       .codigo_idt_ctrlrs	00000000 ex_num13
+00020115 l       .codigo_idt_ctrlrs	00000000 ex_num14
+0002012b l       .codigo_idt_ctrlrs	00000000 ex_num16
+00020141 l       .codigo_idt_ctrlrs	00000000 ex_num17
+00020157 l       .codigo_idt_ctrlrs	00000000 ex_num18
+0002016d l       .codigo_idt_ctrlrs	00000000 ex_num19
+00020183 l       .codigo_idt_ctrlrs	00000000 ex_num20
+00020199 l       .codigo_idt_ctrlrs	00000000 color
+0002019a l       .codigo_idt_ctrlrs	00000000 dummy_entry
+000201a2 l       .codigo_idt_ctrlrs	00000000 FIN
+000201a5 l       .codigo_idt_ctrlrs	00000000 HANDLERS_IDT_START
+00000460 l       *ABS*	00000000 EXCEPTION_DUMMY
+00000000 l    df *ABS*	00000000 funciones_idt.c
+0000f000 l     F .codigo32	0000000c __lidt
+00000000 l    df *ABS*	00000000 funciones_memoria.c
+00000000 l    df *ABS*	00000000 src/start32.s
+0000f14c l       .codigo32	00000000 start32_launcher.stack_init
+0000f187 l       .codigo32	00000000 fin_inic_excepciones
+0000f18e l       .codigo32	00000000 finalizo_programa
+0000f191 l       .codigo32	00000000 inicializo_excepciones
+00000000 l    df *ABS*	00000000 src/utils16.s
+0000f691 l       .text	00000000 RTC_Err_Exit
+0000f694 l       .text	00000000 RTC_Exit
+0000f697 l       .text	00000000 Hora
+0000f6b2 l       .text	00000000 Fecha
+0000f6d5 l       .text	00000000 RTC_disponible
+0000f6d9 l       .text	00000000 wait_for_free
+0000f6fb l       .text	00000000 GateA20_Disabled
+0000f704 l       .text	00000000 Fail
+0000f707 l       .text	00000000 GateA20_Enabled
+0000f70e l       .text	00000000 _Gate_A20
+0000f724 l       .text	00000000 gate_a20_exit
+0000f725 l       .text	00000000 _8042_empty?
+0000f728 l       .text	00000000 empty_8042_01
+00000000 l    df *ABS*	00000000 src/start16.s
+0000f81d l       .codigo16	00000000 flush_prefetch_queue
+00000000 l    df *ABS*	00000000 src/tablas.s
+0000fd00 l       .tablas	00000000 GDT
+00000000 l       *ABS*	00000000 NULL_SEL
+00000020 l       *ABS*	00000000 GDT_LENGHT
+00000000 l    df *ABS*	00000000 src/reset.s
+0000fff0 l       .codigo_reset	00000000 reset_inic
+00020200 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_NMI
+00020460 g       .codigo_idt_ctrlrs	00000000 INT_2
+00020240 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_OF
+000202a0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_NM
+ffff0035 g     F .codigo_kernel32	0000008f print
+00020300 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_NP
+0000f00c g     F .codigo32	00000074 __init_idt
+00000018 g       *ABS*	00000000 DS_SEL
+00020420 g       .codigo_idt_ctrlrs	00000000 INT_0
+0000f679 g       .text	00000000 PIT_Set_1mseg
+000202c0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_DF
+00070000 g       *ABS*	00000000 __STACK_START_32
+000201e0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_DB
+000205c0 g       .codigo_idt_ctrlrs	00000000 INT_13
+00020320 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_SS
+00020580 g       .codigo_idt_ctrlrs	00000000 INT_11
+00020480 g       .codigo_idt_ctrlrs	00000000 INT_3
+0000f000 g       *ABS*	00000000 vma_inic32
+000202e0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_TS
+00020000 g       *ABS*	00000000 ___idt_ctrlrs_vma_st
+000203e0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_XM
+00009000 g       *ABS*	00000000 __STACK_START_16
+0000f800 g       .codigo16	00000000 start16_inic
+0000fff0 g       *ABS*	00000000 vma_reset
+ffff00cf g       .codigo_kernel32	00000000 kernel32_init
+0007ffff g       *ABS*	00000000 __STACK_END_32
+0000f0f6 g     F .codigo32	0000003c __fast_memcpy
+00000010 g       *ABS*	00000000 CS_SEL_32
+00020220 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_BP
+ffff00ff g       *ABS*	00000000 ___idt_ctrlrs_lma_st
+0000fd00 g       *ABS*	00000000 vma_datos
+00020260 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_BR
+000204a0 g       .codigo_idt_ctrlrs	00000000 INT_4
+000205e0 g       .codigo_idt_ctrlrs	00000000 INT_14
+00020280 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_UD
+0000f080 g     F .codigo32	00000076 __set_idt_entry
+00003fff g       *ABS*	00000000 __STACK_SIZE_32
+000205a0 g       .codigo_idt_ctrlrs	00000000 INT_12
+0000ffff g       *ABS*	00000000 __STACK_END_16
+00020540 g       .codigo_idt_ctrlrs	00000000 INT_9
+00000008 g       *ABS*	00000000 CS_SEL_16
+0000fd20 g       .tablas	00000000 GDTR
+000203a0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_AC
+00000000         *UND*	00000000 __handlers_32_01l
+0000f650 g       .text	00000000 PIC_Config
+000204e0 g       .codigo_idt_ctrlrs	00000000 INT_6
+ffff0000 g     F .codigo_kernel32	00000035 clrsrc
+00000605 g       *ABS*	00000000 ___idt_ctrlrs_size
+00020520 g       .codigo_idt_ctrlrs	00000000 INT_8
+00020360 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_PF
+00000000 g       *ABS*	00000000 __IDT_START
+000201c0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_DE
+000204c0 g       .codigo_idt_ctrlrs	00000000 INT_5
+00020340 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_GP
+00020560 g       .codigo_idt_ctrlrs	00000000 INT_10
+00000100 g       *ABS*	00000000 __IDT_ENTRIES
+00020400 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_VE
+0000f6e0 g       .text	00000000 A20_Enable
+0000f687 g       .text	00000000 RTC_Service
+00000800 g       *ABS*	00000000 __IDT_END
+00020600 g       .codigo_idt_ctrlrs	00000000 INT_15
+00020380 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_MF
+0000f800 g       *ABS*	00000000 vma_inic16
+00020440 g       .codigo_idt_ctrlrs	00000000 INT_1
+00020500 g       .codigo_idt_ctrlrs	00000000 INT_7
+00000000         *UND*	00000000 __handlers_32h
+ffff0000 g       *ABS*	00000000 vma_kernel32
+0000f132 g       .codigo32	00000000 start32_launcher
+000203c0 g       .codigo_idt_ctrlrs	00000000 EXCEPTION_MC
+
+
+Contenido de la sección .codigo_kernel32:
+ ffff0000 5589e583 ec10c745 fc00800b 00eb1a8b  U......E........
+ ffff0010 45fcc700 00000000 8345fc04 8b45fcc7  E........E...E..
+ ffff0020 00000000 008345fc 04817dfc 007a0c00  ......E...}..z..
+ ffff0030 75dd90c9 c35589e5 83ec1c8b 4d0c8b55  u....U......M..U
+ ffff0040 108b4514 884dec88 55e88845 e4c745fc  ..E..M..U..E..E.
+ ffff0050 00800b00 807dec4f 7e07b8ff ffffffeb  .....}.O~.......
+ ffff0060 610fbe45 ecc1e003 0145fc0f be55e889  a..E.....E...U..
+ ffff0070 d0c1e002 01d0c1e0 060145fc eb238b45  ..........E..#.E
+ ffff0080 080fb600 0fbed08b 45fc8910 83450801  ........E....E..
+ ffff0090 8345fc04 0fbe55e4 8b45fc89 108345fc  .E....U..E....E.
+ ffff00a0 04837d08 00740981 7dfcff79 0c0076ce  ..}..t..}..y..v.
+ ffff00b0 837d0800 7507b800 000000eb 05b8ffff  .}..u...........
+ ffff00c0 ffffc9c3 486f6c61 206d756e 646f0055  ....Hola mundo.U
+ ffff00d0 89e5e829 ffffff89 ec5d5589 e568ce00  ...).....]U..h..
+ ffff00e0 ffff6a00 6a0068c4 00ffffe8 45ffffff  ..j.j.h.....E...
+ ffff00f0 89ec5d66 87db66b8 00008ec8 f4ebfd    ..]f..f........ 
+Contenido de la sección .codigo_idt_ctrlrs:
+ 20000 45786365 7063696f 6e206765 6e657261  Excepcion genera
+ 20010 64613a20 30457863 65706369 6f6e2067  da: 0Excepcion g
+ 20020 656e6572 6164613a 20314578 63657063  enerada: 1Excepc
+ 20030 696f6e20 67656e65 72616461 3a203245  ion generada: 2E
+ 20040 78636570 63696f6e 2067656e 65726164  xcepcion generad
+ 20050 613a2033 45786365 7063696f 6e206765  a: 3Excepcion ge
+ 20060 6e657261 64613a20 34457863 65706369  nerada: 4Excepci
+ 20070 6f6e2067 656e6572 6164613a 20354578  on generada: 5Ex
+ 20080 63657063 696f6e20 67656e65 72616461  cepcion generada
+ 20090 3a203645 78636570 63696f6e 2067656e  : 6Excepcion gen
+ 200a0 65726164 613a2037 45786365 7063696f  erada: 7Excepcio
+ 200b0 6e206765 6e657261 64613a20 38457863  n generada: 8Exc
+ 200c0 65706369 6f6e2067 656e6572 6164613a  epcion generada:
+ 200d0 20313045 78636570 63696f6e 2067656e   10Excepcion gen
+ 200e0 65726164 613a2031 31457863 65706369  erada: 11Excepci
+ 200f0 6f6e2067 656e6572 6164613a 20313245  on generada: 12E
+ 20100 78636570 63696f6e 2067656e 65726164  xcepcion generad
+ 20110 613a2031 33457863 65706369 6f6e2067  a: 13Excepcion g
+ 20120 656e6572 6164613a 20313445 78636570  enerada: 14Excep
+ 20130 63696f6e 2067656e 65726164 613a2031  cion generada: 1
+ 20140 36457863 65706369 6f6e2067 656e6572  6Excepcion gener
+ 20150 6164613a 20313745 78636570 63696f6e  ada: 17Excepcion
+ 20160 2067656e 65726164 613a2031 38457863   generada: 18Exc
+ 20170 65706369 6f6e2067 656e6572 6164613a  epcion generada:
+ 20180 20313945 78636570 63696f6e 2067656e   19Excepcion gen
+ 20190 65726164 613a2032 300050f4 b020e620  erada: 20.P.. . 
+ 201a0 58cff4eb fd909090 90909090 90909090  X...............
+ 201b0 90909090 90909090 90909090 90909090  ................
+ 201c0 5589e568 99010200 6a006a00 68000002  U..h....j.j.h...
+ 201d0 00e85ffe fcff89ec 5df4cf90 90909090  .._.....].......
+ 201e0 5589e568 99010200 6a006a00 68150002  U..h....j.j.h...
+ 201f0 00e83ffe fcff89ec 5df4cf90 90909090  ..?.....].......
+ 20200 5589e568 99010200 6a006a00 682a0002  U..h....j.j.h*..
+ 20210 00e81ffe fcff89ec 5df4cf90 90909090  ........].......
+ 20220 5589e568 99010200 6a006a00 683f0002  U..h....j.j.h?..
+ 20230 00e8fffd fcff89ec 5df4cf90 90909090  ........].......
+ 20240 5589e568 99010200 6a006a00 68540002  U..h....j.j.hT..
+ 20250 00e8dffd fcff89ec 5df4cf90 90909090  ........].......
+ 20260 5589e568 99010200 6a006a00 68690002  U..h....j.j.hi..
+ 20270 00e8bffd fcff89ec 5df4cf90 90909090  ........].......
+ 20280 5589e568 99010200 6a006a00 687e0002  U..h....j.j.h~..
+ 20290 00e89ffd fcff89ec 5df4cf90 90909090  ........].......
+ 202a0 5589e568 99010200 6a006a00 68930002  U..h....j.j.h...
+ 202b0 00e87ffd fcff89ec 5df4cf90 90909090  ........].......
+ 202c0 5589e568 99010200 6a006a00 68a80002  U..h....j.j.h...
+ 202d0 00e85ffd fcff89ec 5df4cf90 90909090  .._.....].......
+ 202e0 5589e568 99010200 6a006a00 68bd0002  U..h....j.j.h...
+ 202f0 00e83ffd fcff89ec 5df4cf90 90909090  ..?.....].......
+ 20300 5589e568 99010200 6a006a00 68d30002  U..h....j.j.h...
+ 20310 00e81ffd fcff89ec 5df4cf90 90909090  ........].......
+ 20320 5589e568 99010200 6a006a00 68e90002  U..h....j.j.h...
+ 20330 00e8fffc fcff89ec 5df4cf90 90909090  ........].......
+ 20340 5589e568 99010200 6a006a00 68ff0002  U..h....j.j.h...
+ 20350 00e8dffc fcff89ec 5df4cf90 90909090  ........].......
+ 20360 5589e568 99010200 6a006a00 68150102  U..h....j.j.h...
+ 20370 00e8bffc fcff89ec 5df4cf90 90909090  ........].......
+ 20380 5589e568 99010200 6a006a00 682b0102  U..h....j.j.h+..
+ 20390 00e89ffc fcff89ec 5df4cf90 90909090  ........].......
+ 203a0 5589e568 99010200 6a006a00 68410102  U..h....j.j.hA..
+ 203b0 00e87ffc fcff89ec 5df4cf90 90909090  ........].......
+ 203c0 5589e568 99010200 6a006a00 68570102  U..h....j.j.hW..
+ 203d0 00e85ffc fcff89ec 5df4cf90 90909090  .._.....].......
+ 203e0 5589e568 99010200 6a006a00 686d0102  U..h....j.j.hm..
+ 203f0 00e83ffc fcff89ec 5df4cf90 90909090  ..?.....].......
+ 20400 5589e568 99010200 6a006a00 68830102  U..h....j.j.h...
+ 20410 00e81ffc fcff89ec 5df4cf90 90909090  ........].......
+ 20420 e975fdff ff909090 90909090 90909090  .u..............
+ 20430 90909090 90909090 90909090 90909090  ................
+ 20440 e955fdff ff909090 90909090 90909090  .U..............
+ 20450 90909090 90909090 90909090 90909090  ................
+ 20460 e935fdff ff909090 90909090 90909090  .5..............
+ 20470 90909090 90909090 90909090 90909090  ................
+ 20480 e915fdff ff909090 90909090 90909090  ................
+ 20490 90909090 90909090 90909090 90909090  ................
+ 204a0 e9f5fcff ff909090 90909090 90909090  ................
+ 204b0 90909090 90909090 90909090 90909090  ................
+ 204c0 e9d5fcff ff909090 90909090 90909090  ................
+ 204d0 90909090 90909090 90909090 90909090  ................
+ 204e0 e9b5fcff ff909090 90909090 90909090  ................
+ 204f0 90909090 90909090 90909090 90909090  ................
+ 20500 e995fcff ff909090 90909090 90909090  ................
+ 20510 90909090 90909090 90909090 90909090  ................
+ 20520 e975fcff ff909090 90909090 90909090  .u..............
+ 20530 90909090 90909090 90909090 90909090  ................
+ 20540 e955fcff ff909090 90909090 90909090  .U..............
+ 20550 90909090 90909090 90909090 90909090  ................
+ 20560 e935fcff ff909090 90909090 90909090  .5..............
+ 20570 90909090 90909090 90909090 90909090  ................
+ 20580 e915fcff ff909090 90909090 90909090  ................
+ 20590 90909090 90909090 90909090 90909090  ................
+ 205a0 e9f5fbff ff909090 90909090 90909090  ................
+ 205b0 90909090 90909090 90909090 90909090  ................
+ 205c0 e9d5fbff ff909090 90909090 90909090  ................
+ 205d0 90909090 90909090 90909090 90909090  ................
+ 205e0 e9b5fbff ff909090 90909090 90909090  ................
+ 205f0 90909090 90909090 90909090 90909090  ................
+ 20600 e995fbff ff                          .....           
+Contenido de la sección .codigo32:
+ f000 5589e58b 45080f01 18905dc3 5589e583  U...E.....].U...
+ f010 ec148b45 0c8845ec 8b450889 45f8c645  ...E..E..E..E..E
+ f020 ff00eb36 8b45f866 c7000000 8b45f866  ...6.E.f.....E.f
+ f030 c7400200 008b45f8 c6400400 8b45f8c6  .@....E..@...E..
+ f040 40050f8b 45f866c7 40060000 8345f808  @...E.f.@....E..
+ f050 0fb645ff 83c00188 45ff0fb6 45ff3a45  ..E.....E...E.:E
+ f060 ec72c10f b645ec66 8945f28b 45088945  .r...E.f.E..E..E
+ f070 f48d45f2 50e886ff ffff83c4 0490c9c3  ..E.P...........
+ f080 5589e583 ec1c8b4d 088b550c 8b451488  U......M..U..E..
+ f090 4dec6689 55e88845 e4c645ff ff0f014d  M.f.U..E..E....M
+ f0a0 f20fb755 f20fb645 ec6639c2 72428b45  ...U...E.f9.rB.E
+ f0b0 f40fb655 ecc1e203 01d08945 f88b4510  ...U.......E..E.
+ f0c0 89c28b45 f8668910 8b45f80f b755e866  ...E.f...E...U.f
+ f0d0 8950028b 45f80fb6 55e48850 058b4510  .P..E...U..P..E.
+ f0e0 c1e81089 c28b45f8 66895006 c645ff01  ......E.f.P..E..
+ f0f0 0fb645ff c9c35589 e583ec10 c645ffff  ..E...U......E..
+ f100 837d1000 7426eb1a 836d1001 8b450c8d  .}..t&...m...E..
+ f110 50048955 0c8b5508 8d4a0489 4d088b12  P..U..U..J..M...
+ f120 8910837d 100075e0 c645ff01 0fb645ff  ...}..u..E....E.
+ f130 c9c366b8 18008ed8 8ec08ee8 8ee08ed0  ..f.............
+ f140 bcffff07 0031c0b9 ff3f0000 50e2fdbc  .....1...?..P...
+ f150 ffff0700 5589e566 68ff0068 00000000  ....U..fh..h....
+ f160 e8a7feff ff89ec5d 5589e568 05060000  .......]U..h....
+ f170 68000002 0068ff00 ffffe877 ffffffc9  h....h.....w....
+ f180 83f80175 09eb0aea cf00ffff 1000f4eb  ...u............
+ f190 fd5589e5 688f0000 0068c001 02006a00  .U..h....h....j.
+ f1a0 e8dbfeff ffc983f8 0175e355 89e5688f  .........u.U..h.
+ f1b0 00000068 e0010200 68100000 006a01e8  ...h....h....j..
+ f1c0 bcfeffff c983f801 75c45589 e5688f00  ........u.U..h..
+ f1d0 00006800 02020068 10000000 6a02e89d  ..h....h....j...
+ f1e0 feffffc9 83f80175 a55589e5 688f0000  .......u.U..h...
+ f1f0 00682002 02006810 0000006a 03e87efe  .h ...h....j..~.
+ f200 ffffc983 f8017586 5589e568 8f000000  ......u.U..h....
+ f210 68400202 00681000 00006a04 e85ffeff  h@...h....j.._..
+ f220 ffc983f8 010f8563 ffffff55 89e5688f  .......c...U..h.
+ f230 00000068 60020200 68100000 006a05e8  ...h`...h....j..
+ f240 3cfeffff c983f801 0f8540ff ffff5589  <.........@...U.
+ f250 e5688f00 00006880 02020068 10000000  .h....h....h....
+ f260 6a06e819 feffffc9 83f8010f 851dffff  j...............
+ f270 ff5589e5 688f0000 0068a002 02006810  .U..h....h....h.
+ f280 0000006a 07e8f6fd ffffc983 f8010f85  ...j............
+ f290 fafeffff 5589e568 8f000000 68c00202  ....U..h....h...
+ f2a0 00681000 00006a08 e8d3fdff ffc983f8  .h....j.........
+ f2b0 010f85d7 feffff55 89e5688f 00000068  .......U..h....h
+ f2c0 e0020200 68100000 006a0ae8 b0fdffff  ....h....j......
+ f2d0 c983f801 0f85b4fe ffff5589 e5688f00  ..........U..h..
+ f2e0 00006800 03020068 10000000 6a0be88d  ..h....h....j...
+ f2f0 fdffffc9 83f8010f 8591feff ff5589e5  .............U..
+ f300 688f0000 00682003 02006810 0000006a  h....h ...h....j
+ f310 0ce86afd ffffc983 f8010f85 6efeffff  ..j.........n...
+ f320 5589e568 8f000000 68400302 00681000  U..h....h@...h..
+ f330 00006a0d e847fdff ffc983f8 010f854b  ..j..G.........K
+ f340 feffff55 89e5688f 00000068 60030200  ...U..h....h`...
+ f350 68100000 006a0ee8 24fdffff c983f801  h....j..$.......
+ f360 0f8528fe ffff5589 e5688f00 00006880  ..(...U..h....h.
+ f370 03020068 10000000 6a10e801 fdffffc9  ...h....j.......
+ f380 83f8010f 8505feff ff5589e5 688f0000  .........U..h...
+ f390 0068a003 02006810 0000006a 11e8defc  .h....h....j....
+ f3a0 ffffc983 f8010f85 e2fdffff 5589e568  ............U..h
+ f3b0 8f000000 68c00302 00681000 00006a12  ....h....h....j.
+ f3c0 e8bbfcff ffc983f8 010f85bf fdffff55  ...............U
+ f3d0 89e5688f 00000068 e0030200 68100000  ..h....h....h...
+ f3e0 006a13e8 98fcffff c983f801 0f859cfd  .j..............
+ f3f0 ffff5589 e5688f00 00006800 04020068  ..U..h....h....h
+ f400 10000000 6a14e875 fcffffc9 83f8010f  ....j..u........
+ f410 8579fdff ff5589e5 688f0000 00682004  .y...U..h....h .
+ f420 02006810 0000006a 20e852fc ffffc983  ..h....j .R.....
+ f430 f8010f85 56fdffff 5589e568 8f000000  ....V...U..h....
+ f440 68400402 00681000 00006a21 e82ffcff  h@...h....j!./..
+ f450 ffc983f8 010f8533 fdffff55 89e5688f  .......3...U..h.
+ f460 00000068 60040200 68100000 006a22e8  ...h`...h....j".
+ f470 0cfcffff c983f801 0f8510fd ffff5589  ..............U.
+ f480 e5688f00 00006880 04020068 10000000  .h....h....h....
+ f490 6a23e8e9 fbffffc9 83f8010f 85edfcff  j#..............
+ f4a0 ff5589e5 688f0000 0068a004 02006810  .U..h....h....h.
+ f4b0 0000006a 24e8c6fb ffffc983 f8010f85  ...j$...........
+ f4c0 cafcffff 5589e568 8f000000 68c00402  ....U..h....h...
+ f4d0 00681000 00006a25 e8a3fbff ffc983f8  .h....j%........
+ f4e0 010f85a7 fcffff55 89e5688f 00000068  .......U..h....h
+ f4f0 e0040200 68100000 006a26e8 80fbffff  ....h....j&.....
+ f500 c983f801 0f8584fc ffff5589 e5688f00  ..........U..h..
+ f510 00006800 05020068 10000000 6a27e85d  ..h....h....j'.]
+ f520 fbffffc9 83f8010f 8561fcff ff5589e5  .........a...U..
+ f530 688f0000 00682005 02006810 0000006a  h....h ...h....j
+ f540 28e83afb ffffc983 f8010f85 3efcffff  (.:.........>...
+ f550 5589e568 8f000000 68400502 00681000  U..h....h@...h..
+ f560 00006a29 e817fbff ffc983f8 010f851b  ..j)............
+ f570 fcffff55 89e5688f 00000068 60050200  ...U..h....h`...
+ f580 68100000 006a2ae8 f4faffff c983f801  h....j*.........
+ f590 0f85f8fb ffff5589 e5688f00 00006880  ......U..h....h.
+ f5a0 05020068 10000000 6a2be8d1 faffffc9  ...h....j+......
+ f5b0 83f8010f 85d5fbff ff5589e5 688f0000  .........U..h...
+ f5c0 0068a005 02006810 0000006a 2ce8aefa  .h....h....j,...
+ f5d0 ffffc983 f8010f85 b2fbffff 5589e568  ............U..h
+ f5e0 8f000000 68c00502 00681000 00006a2d  ....h....h....j-
+ f5f0 e88bfaff ffc983f8 010f858f fbffff55  ...............U
+ f600 89e5688f 00000068 e0050200 68100000  ..h....h....h...
+ f610 006a2ee8 68faffff c983f801 0f856cfb  .j..h.........l.
+ f620 ffff5589 e5688f00 00006800 06020068  ..U..h....h....h
+ f630 10000000 6a2fe845 faffffc9 83f8010f  ....j/.E........
+ f640 8549fbff ffe93dfb ffff               .I....=...      
+Contenido de la sección .text:
+ f650 b011e620 88d8e621 b004e621 b001e621  ... ...!...!...!
+ f660 b0ffe621 b011e6a0 88f8e6a1 b002e6a1  ...!............
+ f670 b001e6a1 b0ffe6a1 c3b034e6 43b8a904  ..........4.C...
+ f680 e64088e0 e640c33c 0074273c 017408eb  .@...@.<.t'<.t..
+ f690 00b101c3 b100c3e8 3b00b004 e670e471  ........;....p.q
+ f6a0 88c2b002 e670e471 88c430c0 e670e471  .....p.q..0..p.q
+ f6b0 ebe2e820 00b009e6 70e47188 c6b008e6  ... ....p.q.....
+ f6c0 70e47188 c2b007e6 70e47188 c4b006e6  p.q.....p.q.....
+ f6d0 70e471eb bfb00ae6 70e471a8 8075fac3  p.q.....p.q..u..
+ f6e0 b8ffff8e c026813e 0e7e55aa 740dd106  .....&.>.~U.t...
+ f6f0 fe7d2681 3e0e7eaa 55750cb0 dfe80e00  .}&.>.~.Uu......
+ f700 3c007403 f4ebfdc7 06fe7d55 aac3fae8  <.t.......}U....
+ f710 13007510 b0d1e664 e80a0075 0788e0e6  ..u....d...u....
+ f720 60e80100 c35129c9 e4642402 e0fa59c3  `....Q)..d$...Y.
+Contenido de la sección .codigo16:
+ f800 8cc88ed8 0f011620 fdb80090 8ed0bcff  ....... ........
+ f810 ff0f20c0 6683c801 0f22c0eb 00b832f1  .. .f...."....2.
+ f820 9c680800 50cf                        .h..P.          
+Contenido de la sección .tablas:
+ fd00 00000000 00000000 ffff0000 ff9940ff  ..............@.
+ fd10 ffff0000 0099cf00 ffff0000 0092cf00  ................
+ fd20 1f0000fd 0f00                        ......          
+Contenido de la sección .codigo_reset:
+ fff0 fafce90b f8                          .....           
+Contenido de la sección .fill_rom16:
+ fff5 90909090 90909090 9090               ..........      
+Contenido de la sección .end_rom16:
+ ffff 90                                   .               
+Contenido de la sección .comment:
+ 0000 4743433a 20285562 756e7475 20352e34  GCC: (Ubuntu 5.4
+ 0010 2e302d36 7562756e 7475317e 31362e30  .0-6ubuntu1~16.0
+ 0020 342e3429 20352e34 2e302032 30313630  4.4) 5.4.0 20160
+ 0030 36303900                             609.            
+
+Desensamblado de la sección .codigo_kernel32:
+ffff0000 <clrsrc> push   %ebp
+ffff0001 <clrsrc+0x1> mov    %esp,%ebp
+ffff0003 <clrsrc+0x3> sub    $0x10,%esp
+ffff0006 <clrsrc+0x6> movl   $0xb8000,-0x4(%ebp)
+ffff000d <clrsrc+0xd> jmp    ffff0029 <clrsrc+0x29>
+ffff000f <clrsrc+0xf> mov    -0x4(%ebp),%eax
+ffff0012 <clrsrc+0x12> movl   $0x0,(%eax)
+ffff0018 <clrsrc+0x18> addl   $0x4,-0x4(%ebp)
+ffff001c <clrsrc+0x1c> mov    -0x4(%ebp),%eax
+ffff001f <clrsrc+0x1f> movl   $0x0,(%eax)
+ffff0025 <clrsrc+0x25> addl   $0x4,-0x4(%ebp)
+ffff0029 <clrsrc+0x29> cmpl   $0xc7a00,-0x4(%ebp)
+ffff0030 <clrsrc+0x30> jne    ffff000f <clrsrc+0xf>
+ffff0032 <clrsrc+0x32> nop
+ffff0033 <clrsrc+0x33> leave  
+ffff0034 <clrsrc+0x34> ret    
+ffff0035 <print> push   %ebp
+ffff0036 <print+0x1> mov    %esp,%ebp
+ffff0038 <print+0x3> sub    $0x1c,%esp
+ffff003b <print+0x6> mov    0xc(%ebp),%ecx
+ffff003e <print+0x9> mov    0x10(%ebp),%edx
+ffff0041 <print+0xc> mov    0x14(%ebp),%eax
+ffff0044 <print+0xf> mov    %cl,-0x14(%ebp)
+ffff0047 <print+0x12> mov    %dl,-0x18(%ebp)
+ffff004a <print+0x15> mov    %al,-0x1c(%ebp)
+ffff004d <print+0x18> movl   $0xb8000,-0x4(%ebp)
+ffff0054 <print+0x1f> cmpb   $0x4f,-0x14(%ebp)
+ffff0058 <print+0x23> jle    ffff0061 <print+0x2c>
+ffff005a <print+0x25> mov    $0xffffffff,%eax
+ffff005f <print+0x2a> jmp    ffff00c2 <print+0x8d>
+ffff0061 <print+0x2c> movsbl -0x14(%ebp),%eax
+ffff0065 <print+0x30> shl    $0x3,%eax
+ffff0068 <print+0x33> add    %eax,-0x4(%ebp)
+ffff006b <print+0x36> movsbl -0x18(%ebp),%edx
+ffff006f <print+0x3a> mov    %edx,%eax
+ffff0071 <print+0x3c> shl    $0x2,%eax
+ffff0074 <print+0x3f> add    %edx,%eax
+ffff0076 <print+0x41> shl    $0x6,%eax
+ffff0079 <print+0x44> add    %eax,-0x4(%ebp)
+ffff007c <print+0x47> jmp    ffff00a1 <print+0x6c>
+ffff007e <print+0x49> mov    0x8(%ebp),%eax
+ffff0081 <print+0x4c> movzbl (%eax),%eax
+ffff0084 <print+0x4f> movsbl %al,%edx
+ffff0087 <print+0x52> mov    -0x4(%ebp),%eax
+ffff008a <print+0x55> mov    %edx,(%eax)
+ffff008c <print+0x57> addl   $0x1,0x8(%ebp)
+ffff0090 <print+0x5b> addl   $0x4,-0x4(%ebp)
+ffff0094 <print+0x5f> movsbl -0x1c(%ebp),%edx
+ffff0098 <print+0x63> mov    -0x4(%ebp),%eax
+ffff009b <print+0x66> mov    %edx,(%eax)
+ffff009d <print+0x68> addl   $0x4,-0x4(%ebp)
+ffff00a1 <print+0x6c> cmpl   $0x0,0x8(%ebp)
+ffff00a5 <print+0x70> je     ffff00b0 <print+0x7b>
+ffff00a7 <print+0x72> cmpl   $0xc79ff,-0x4(%ebp)
+ffff00ae <print+0x79> jbe    ffff007e <print+0x49>
+ffff00b0 <print+0x7b> cmpl   $0x0,0x8(%ebp)
+ffff00b4 <print+0x7f> jne    ffff00bd <print+0x88>
+ffff00b6 <print+0x81> mov    $0x0,%eax
+ffff00bb <print+0x86> jmp    ffff00c2 <print+0x8d>
+ffff00bd <print+0x88> mov    $0xffffffff,%eax
+ffff00c2 <print+0x8d> leave  
+ffff00c3 <print+0x8e> ret    
+ffff00c4 <const_string> dec    %eax
+ffff00c5 <const_string+0x1> outsl  %ds:(%esi),(%dx)
+ffff00c6 <const_string+0x2> insb   (%dx),%es:(%edi)
+ffff00c7 <const_string+0x3> popa   
+ffff00c8 <const_string+0x4> and    %ch,0x75(%ebp)
+ffff00cb <const_string+0x7> outsb  %ds:(%esi),(%dx)
+ffff00cc <const_string+0x8> outsl  %fs:(%esi),(%dx)
+	...
+ffff00cf <kernel32_init> push   %ebp
+ffff00d0 <kernel32_init+0x1> mov    %esp,%ebp
+ffff00d2 <kernel32_init+0x3> call   ffff0000 <clrsrc>
+ffff00d7 <kernel32_init+0x8> mov    %ebp,%esp
+ffff00d9 <kernel32_init+0xa> pop    %ebp
+ffff00da <kernel32_init+0xb> push   %ebp
+ffff00db <kernel32_init+0xc> mov    %esp,%ebp
+ffff00dd <kernel32_init+0xe> push   $0xffff00ce
+ffff00e2 <kernel32_init+0x13> push   $0x0
+ffff00e4 <kernel32_init+0x15> push   $0x0
+ffff00e6 <kernel32_init+0x17> push   $0xffff00c4
+ffff00eb <kernel32_init+0x1c> call   ffff0035 <print>
+ffff00f0 <kernel32_init+0x21> mov    %ebp,%esp
+ffff00f2 <kernel32_init+0x23> pop    %ebp
+ffff00f3 <kernel32_init+0x24> xchg   %bx,%bx
+ffff00f6 <kernel32_init+0x27> mov    $0x0,%ax
+ffff00fa <kernel32_init+0x2b> mov    %eax,%cs
+ffff00fc <ACA> hlt    
+ffff00fd <ACA+0x1> jmp    ffff00fc <ACA>
+
+Desensamblado de la sección .codigo32:
+0000f000 <__lidt> push   %ebp
+0000f001 <__lidt+0x1> mov    %esp,%ebp
+0000f003 <__lidt+0x3> mov    0x8(%ebp),%eax
+0000f006 <__lidt+0x6> lidtl  (%eax)
+0000f009 <__lidt+0x9> nop
+0000f00a <__lidt+0xa> pop    %ebp
+0000f00b <__lidt+0xb> ret    
+0000f00c <__init_idt> push   %ebp
+0000f00d <__init_idt+0x1> mov    %esp,%ebp
+0000f00f <__init_idt+0x3> sub    $0x14,%esp
+0000f012 <__init_idt+0x6> mov    0xc(%ebp),%eax
+0000f015 <__init_idt+0x9> mov    %al,-0x14(%ebp)
+0000f018 <__init_idt+0xc> mov    0x8(%ebp),%eax
+0000f01b <__init_idt+0xf> mov    %eax,-0x8(%ebp)
+0000f01e <__init_idt+0x12> movb   $0x0,-0x1(%ebp)
+0000f022 <__init_idt+0x16> jmp    0000f05a <__init_idt+0x4e>
+0000f024 <__init_idt+0x18> mov    -0x8(%ebp),%eax
+0000f027 <__init_idt+0x1b> movw   $0x0,(%eax)
+0000f02c <__init_idt+0x20> mov    -0x8(%ebp),%eax
+0000f02f <__init_idt+0x23> movw   $0x0,0x2(%eax)
+0000f035 <__init_idt+0x29> mov    -0x8(%ebp),%eax
+0000f038 <__init_idt+0x2c> movb   $0x0,0x4(%eax)
+0000f03c <__init_idt+0x30> mov    -0x8(%ebp),%eax
+0000f03f <__init_idt+0x33> movb   $0xf,0x5(%eax)
+0000f043 <__init_idt+0x37> mov    -0x8(%ebp),%eax
+0000f046 <__init_idt+0x3a> movw   $0x0,0x6(%eax)
+0000f04c <__init_idt+0x40> addl   $0x8,-0x8(%ebp)
+0000f050 <__init_idt+0x44> movzbl -0x1(%ebp),%eax
+0000f054 <__init_idt+0x48> add    $0x1,%eax
+0000f057 <__init_idt+0x4b> mov    %al,-0x1(%ebp)
+0000f05a <__init_idt+0x4e> movzbl -0x1(%ebp),%eax
+0000f05e <__init_idt+0x52> cmp    -0x14(%ebp),%al
+0000f061 <__init_idt+0x55> jb     0000f024 <__init_idt+0x18>
+0000f063 <__init_idt+0x57> movzbl -0x14(%ebp),%eax
+0000f067 <__init_idt+0x5b> mov    %ax,-0xe(%ebp)
+0000f06b <__init_idt+0x5f> mov    0x8(%ebp),%eax
+0000f06e <__init_idt+0x62> mov    %eax,-0xc(%ebp)
+0000f071 <__init_idt+0x65> lea    -0xe(%ebp),%eax
+0000f074 <__init_idt+0x68> push   %eax
+0000f075 <__init_idt+0x69> call   0000f000 <__lidt>
+0000f07a <__init_idt+0x6e> add    $0x4,%esp
+0000f07d <__init_idt+0x71> nop
+0000f07e <__init_idt+0x72> leave  
+0000f07f <__init_idt+0x73> ret    
+0000f080 <__set_idt_entry> push   %ebp
+0000f081 <__set_idt_entry+0x1> mov    %esp,%ebp
+0000f083 <__set_idt_entry+0x3> sub    $0x1c,%esp
+0000f086 <__set_idt_entry+0x6> mov    0x8(%ebp),%ecx
+0000f089 <__set_idt_entry+0x9> mov    0xc(%ebp),%edx
+0000f08c <__set_idt_entry+0xc> mov    0x14(%ebp),%eax
+0000f08f <__set_idt_entry+0xf> mov    %cl,-0x14(%ebp)
+0000f092 <__set_idt_entry+0x12> mov    %dx,-0x18(%ebp)
+0000f096 <__set_idt_entry+0x16> mov    %al,-0x1c(%ebp)
+0000f099 <__set_idt_entry+0x19> movb   $0xff,-0x1(%ebp)
+0000f09d <__set_idt_entry+0x1d> sidtl  -0xe(%ebp)
+0000f0a1 <__set_idt_entry+0x21> movzwl -0xe(%ebp),%edx
+0000f0a5 <__set_idt_entry+0x25> movzbl -0x14(%ebp),%eax
+0000f0a9 <__set_idt_entry+0x29> cmp    %ax,%dx
+0000f0ac <__set_idt_entry+0x2c> jb     0000f0f0 <__set_idt_entry+0x70>
+0000f0ae <__set_idt_entry+0x2e> mov    -0xc(%ebp),%eax
+0000f0b1 <__set_idt_entry+0x31> movzbl -0x14(%ebp),%edx
+0000f0b5 <__set_idt_entry+0x35> shl    $0x3,%edx
+0000f0b8 <__set_idt_entry+0x38> add    %edx,%eax
+0000f0ba <__set_idt_entry+0x3a> mov    %eax,-0x8(%ebp)
+0000f0bd <__set_idt_entry+0x3d> mov    0x10(%ebp),%eax
+0000f0c0 <__set_idt_entry+0x40> mov    %eax,%edx
+0000f0c2 <__set_idt_entry+0x42> mov    -0x8(%ebp),%eax
+0000f0c5 <__set_idt_entry+0x45> mov    %dx,(%eax)
+0000f0c8 <__set_idt_entry+0x48> mov    -0x8(%ebp),%eax
+0000f0cb <__set_idt_entry+0x4b> movzwl -0x18(%ebp),%edx
+0000f0cf <__set_idt_entry+0x4f> mov    %dx,0x2(%eax)
+0000f0d3 <__set_idt_entry+0x53> mov    -0x8(%ebp),%eax
+0000f0d6 <__set_idt_entry+0x56> movzbl -0x1c(%ebp),%edx
+0000f0da <__set_idt_entry+0x5a> mov    %dl,0x5(%eax)
+0000f0dd <__set_idt_entry+0x5d> mov    0x10(%ebp),%eax
+0000f0e0 <__set_idt_entry+0x60> shr    $0x10,%eax
+0000f0e3 <__set_idt_entry+0x63> mov    %eax,%edx
+0000f0e5 <__set_idt_entry+0x65> mov    -0x8(%ebp),%eax
+0000f0e8 <__set_idt_entry+0x68> mov    %dx,0x6(%eax)
+0000f0ec <__set_idt_entry+0x6c> movb   $0x1,-0x1(%ebp)
+0000f0f0 <__set_idt_entry+0x70> movzbl -0x1(%ebp),%eax
+0000f0f4 <__set_idt_entry+0x74> leave  
+0000f0f5 <__set_idt_entry+0x75> ret    
+0000f0f6 <__fast_memcpy> push   %ebp
+0000f0f7 <__fast_memcpy+0x1> mov    %esp,%ebp
+0000f0f9 <__fast_memcpy+0x3> sub    $0x10,%esp
+0000f0fc <__fast_memcpy+0x6> movb   $0xff,-0x1(%ebp)
+0000f100 <__fast_memcpy+0xa> cmpl   $0x0,0x10(%ebp)
+0000f104 <__fast_memcpy+0xe> je     0000f12c <__fast_memcpy+0x36>
+0000f106 <__fast_memcpy+0x10> jmp    0000f122 <__fast_memcpy+0x2c>
+0000f108 <__fast_memcpy+0x12> subl   $0x1,0x10(%ebp)
+0000f10c <__fast_memcpy+0x16> mov    0xc(%ebp),%eax
+0000f10f <__fast_memcpy+0x19> lea    0x4(%eax),%edx
+0000f112 <__fast_memcpy+0x1c> mov    %edx,0xc(%ebp)
+0000f115 <__fast_memcpy+0x1f> mov    0x8(%ebp),%edx
+0000f118 <__fast_memcpy+0x22> lea    0x4(%edx),%ecx
+0000f11b <__fast_memcpy+0x25> mov    %ecx,0x8(%ebp)
+0000f11e <__fast_memcpy+0x28> mov    (%edx),%edx
+0000f120 <__fast_memcpy+0x2a> mov    %edx,(%eax)
+0000f122 <__fast_memcpy+0x2c> cmpl   $0x0,0x10(%ebp)
+0000f126 <__fast_memcpy+0x30> jne    0000f108 <__fast_memcpy+0x12>
+0000f128 <__fast_memcpy+0x32> movb   $0x1,-0x1(%ebp)
+0000f12c <__fast_memcpy+0x36> movzbl -0x1(%ebp),%eax
+0000f130 <__fast_memcpy+0x3a> leave  
+0000f131 <__fast_memcpy+0x3b> ret    
+0000f132 <start32_launcher> mov    $0x18,%ax
+0000f136 <start32_launcher+0x4> mov    %eax,%ds
+0000f138 <start32_launcher+0x6> mov    %eax,%es
+0000f13a <start32_launcher+0x8> mov    %eax,%gs
+0000f13c <start32_launcher+0xa> mov    %eax,%fs
+0000f13e <start32_launcher+0xc> mov    %eax,%ss
+0000f140 <start32_launcher+0xe> mov    $0x7ffff,%esp
+0000f145 <start32_launcher+0x13> xor    %eax,%eax
+0000f147 <start32_launcher+0x15> mov    $0x3fff,%ecx
+0000f14c <start32_launcher.stack_init> push   %eax
+0000f14d <start32_launcher.stack_init+0x1> loop   0000f14c <start32_launcher.stack_init>
+0000f14f <start32_launcher.stack_init+0x3> mov    $0x7ffff,%esp
+0000f154 <start32_launcher.stack_init+0x8> push   %ebp
+0000f155 <start32_launcher.stack_init+0x9> mov    %esp,%ebp
+0000f157 <start32_launcher.stack_init+0xb> pushw  $0xff
+0000f15b <start32_launcher.stack_init+0xf> push   $0x0
+0000f160 <start32_launcher.stack_init+0x14> call   0000f00c <__init_idt>
+0000f165 <start32_launcher.stack_init+0x19> mov    %ebp,%esp
+0000f167 <start32_launcher.stack_init+0x1b> pop    %ebp
+0000f168 <start32_launcher.stack_init+0x1c> push   %ebp
+0000f169 <start32_launcher.stack_init+0x1d> mov    %esp,%ebp
+0000f16b <start32_launcher.stack_init+0x1f> push   $0x605
+0000f170 <start32_launcher.stack_init+0x24> push   $0x20000
+0000f175 <start32_launcher.stack_init+0x29> push   $0xffff00ff
+0000f17a <start32_launcher.stack_init+0x2e> call   0000f0f6 <__fast_memcpy>
+0000f17f <start32_launcher.stack_init+0x33> leave  
+0000f180 <start32_launcher.stack_init+0x34> cmp    $0x1,%eax
+0000f183 <start32_launcher.stack_init+0x37> jne    0000f18e <finalizo_programa>
+0000f185 <start32_launcher.stack_init+0x39> jmp    0000f191 <inicializo_excepciones>
+0000f187 <fin_inic_excepciones> ljmp   $0x10,$0xffff00cf
+0000f18e <finalizo_programa> hlt    
+0000f18f <finalizo_programa+0x1> jmp    0000f18e <finalizo_programa>
+0000f191 <inicializo_excepciones> push   %ebp
+0000f192 <inicializo_excepciones+0x1> mov    %esp,%ebp
+0000f194 <inicializo_excepciones+0x3> push   $0x8f
+0000f199 <inicializo_excepciones+0x8> push   $0x201c0
+0000f19e <inicializo_excepciones+0xd> push   $0x0
+0000f1a0 <inicializo_excepciones+0xf> call   0000f080 <__set_idt_entry>
+0000f1a5 <inicializo_excepciones+0x14> leave  
+0000f1a6 <inicializo_excepciones+0x15> cmp    $0x1,%eax
+0000f1a9 <inicializo_excepciones+0x18> jne    0000f18e <finalizo_programa>
+0000f1ab <inicializo_excepciones+0x1a> push   %ebp
+0000f1ac <inicializo_excepciones+0x1b> mov    %esp,%ebp
+0000f1ae <inicializo_excepciones+0x1d> push   $0x8f
+0000f1b3 <inicializo_excepciones+0x22> push   $0x201e0
+0000f1b8 <inicializo_excepciones+0x27> push   $0x10
+0000f1bd <inicializo_excepciones+0x2c> push   $0x1
+0000f1bf <inicializo_excepciones+0x2e> call   0000f080 <__set_idt_entry>
+0000f1c4 <inicializo_excepciones+0x33> leave  
+0000f1c5 <inicializo_excepciones+0x34> cmp    $0x1,%eax
+0000f1c8 <inicializo_excepciones+0x37> jne    0000f18e <finalizo_programa>
+0000f1ca <inicializo_excepciones+0x39> push   %ebp
+0000f1cb <inicializo_excepciones+0x3a> mov    %esp,%ebp
+0000f1cd <inicializo_excepciones+0x3c> push   $0x8f
+0000f1d2 <inicializo_excepciones+0x41> push   $0x20200
+0000f1d7 <inicializo_excepciones+0x46> push   $0x10
+0000f1dc <inicializo_excepciones+0x4b> push   $0x2
+0000f1de <inicializo_excepciones+0x4d> call   0000f080 <__set_idt_entry>
+0000f1e3 <inicializo_excepciones+0x52> leave  
+0000f1e4 <inicializo_excepciones+0x53> cmp    $0x1,%eax
+0000f1e7 <inicializo_excepciones+0x56> jne    0000f18e <finalizo_programa>
+0000f1e9 <inicializo_excepciones+0x58> push   %ebp
+0000f1ea <inicializo_excepciones+0x59> mov    %esp,%ebp
+0000f1ec <inicializo_excepciones+0x5b> push   $0x8f
+0000f1f1 <inicializo_excepciones+0x60> push   $0x20220
+0000f1f6 <inicializo_excepciones+0x65> push   $0x10
+0000f1fb <inicializo_excepciones+0x6a> push   $0x3
+0000f1fd <inicializo_excepciones+0x6c> call   0000f080 <__set_idt_entry>
+0000f202 <inicializo_excepciones+0x71> leave  
+0000f203 <inicializo_excepciones+0x72> cmp    $0x1,%eax
+0000f206 <inicializo_excepciones+0x75> jne    0000f18e <finalizo_programa>
+0000f208 <inicializo_excepciones+0x77> push   %ebp
+0000f209 <inicializo_excepciones+0x78> mov    %esp,%ebp
+0000f20b <inicializo_excepciones+0x7a> push   $0x8f
+0000f210 <inicializo_excepciones+0x7f> push   $0x20240
+0000f215 <inicializo_excepciones+0x84> push   $0x10
+0000f21a <inicializo_excepciones+0x89> push   $0x4
+0000f21c <inicializo_excepciones+0x8b> call   0000f080 <__set_idt_entry>
+0000f221 <inicializo_excepciones+0x90> leave  
+0000f222 <inicializo_excepciones+0x91> cmp    $0x1,%eax
+0000f225 <inicializo_excepciones+0x94> jne    0000f18e <finalizo_programa>
+0000f22b <inicializo_excepciones+0x9a> push   %ebp
+0000f22c <inicializo_excepciones+0x9b> mov    %esp,%ebp
+0000f22e <inicializo_excepciones+0x9d> push   $0x8f
+0000f233 <inicializo_excepciones+0xa2> push   $0x20260
+0000f238 <inicializo_excepciones+0xa7> push   $0x10
+0000f23d <inicializo_excepciones+0xac> push   $0x5
+0000f23f <inicializo_excepciones+0xae> call   0000f080 <__set_idt_entry>
+0000f244 <inicializo_excepciones+0xb3> leave  
+0000f245 <inicializo_excepciones+0xb4> cmp    $0x1,%eax
+0000f248 <inicializo_excepciones+0xb7> jne    0000f18e <finalizo_programa>
+0000f24e <inicializo_excepciones+0xbd> push   %ebp
+0000f24f <inicializo_excepciones+0xbe> mov    %esp,%ebp
+0000f251 <inicializo_excepciones+0xc0> push   $0x8f
+0000f256 <inicializo_excepciones+0xc5> push   $0x20280
+0000f25b <inicializo_excepciones+0xca> push   $0x10
+0000f260 <inicializo_excepciones+0xcf> push   $0x6
+0000f262 <inicializo_excepciones+0xd1> call   0000f080 <__set_idt_entry>
+0000f267 <inicializo_excepciones+0xd6> leave  
+0000f268 <inicializo_excepciones+0xd7> cmp    $0x1,%eax
+0000f26b <inicializo_excepciones+0xda> jne    0000f18e <finalizo_programa>
+0000f271 <inicializo_excepciones+0xe0> push   %ebp
+0000f272 <inicializo_excepciones+0xe1> mov    %esp,%ebp
+0000f274 <inicializo_excepciones+0xe3> push   $0x8f
+0000f279 <inicializo_excepciones+0xe8> push   $0x202a0
+0000f27e <inicializo_excepciones+0xed> push   $0x10
+0000f283 <inicializo_excepciones+0xf2> push   $0x7
+0000f285 <inicializo_excepciones+0xf4> call   0000f080 <__set_idt_entry>
+0000f28a <inicializo_excepciones+0xf9> leave  
+0000f28b <inicializo_excepciones+0xfa> cmp    $0x1,%eax
+0000f28e <inicializo_excepciones+0xfd> jne    0000f18e <finalizo_programa>
+0000f294 <inicializo_excepciones+0x103> push   %ebp
+0000f295 <inicializo_excepciones+0x104> mov    %esp,%ebp
+0000f297 <inicializo_excepciones+0x106> push   $0x8f
+0000f29c <inicializo_excepciones+0x10b> push   $0x202c0
+0000f2a1 <inicializo_excepciones+0x110> push   $0x10
+0000f2a6 <inicializo_excepciones+0x115> push   $0x8
+0000f2a8 <inicializo_excepciones+0x117> call   0000f080 <__set_idt_entry>
+0000f2ad <inicializo_excepciones+0x11c> leave  
+0000f2ae <inicializo_excepciones+0x11d> cmp    $0x1,%eax
+0000f2b1 <inicializo_excepciones+0x120> jne    0000f18e <finalizo_programa>
+0000f2b7 <inicializo_excepciones+0x126> push   %ebp
+0000f2b8 <inicializo_excepciones+0x127> mov    %esp,%ebp
+0000f2ba <inicializo_excepciones+0x129> push   $0x8f
+0000f2bf <inicializo_excepciones+0x12e> push   $0x202e0
+0000f2c4 <inicializo_excepciones+0x133> push   $0x10
+0000f2c9 <inicializo_excepciones+0x138> push   $0xa
+0000f2cb <inicializo_excepciones+0x13a> call   0000f080 <__set_idt_entry>
+0000f2d0 <inicializo_excepciones+0x13f> leave  
+0000f2d1 <inicializo_excepciones+0x140> cmp    $0x1,%eax
+0000f2d4 <inicializo_excepciones+0x143> jne    0000f18e <finalizo_programa>
+0000f2da <inicializo_excepciones+0x149> push   %ebp
+0000f2db <inicializo_excepciones+0x14a> mov    %esp,%ebp
+0000f2dd <inicializo_excepciones+0x14c> push   $0x8f
+0000f2e2 <inicializo_excepciones+0x151> push   $0x20300
+0000f2e7 <inicializo_excepciones+0x156> push   $0x10
+0000f2ec <inicializo_excepciones+0x15b> push   $0xb
+0000f2ee <inicializo_excepciones+0x15d> call   0000f080 <__set_idt_entry>
+0000f2f3 <inicializo_excepciones+0x162> leave  
+0000f2f4 <inicializo_excepciones+0x163> cmp    $0x1,%eax
+0000f2f7 <inicializo_excepciones+0x166> jne    0000f18e <finalizo_programa>
+0000f2fd <inicializo_excepciones+0x16c> push   %ebp
+0000f2fe <inicializo_excepciones+0x16d> mov    %esp,%ebp
+0000f300 <inicializo_excepciones+0x16f> push   $0x8f
+0000f305 <inicializo_excepciones+0x174> push   $0x20320
+0000f30a <inicializo_excepciones+0x179> push   $0x10
+0000f30f <inicializo_excepciones+0x17e> push   $0xc
+0000f311 <inicializo_excepciones+0x180> call   0000f080 <__set_idt_entry>
+0000f316 <inicializo_excepciones+0x185> leave  
+0000f317 <inicializo_excepciones+0x186> cmp    $0x1,%eax
+0000f31a <inicializo_excepciones+0x189> jne    0000f18e <finalizo_programa>
+0000f320 <inicializo_excepciones+0x18f> push   %ebp
+0000f321 <inicializo_excepciones+0x190> mov    %esp,%ebp
+0000f323 <inicializo_excepciones+0x192> push   $0x8f
+0000f328 <inicializo_excepciones+0x197> push   $0x20340
+0000f32d <inicializo_excepciones+0x19c> push   $0x10
+0000f332 <inicializo_excepciones+0x1a1> push   $0xd
+0000f334 <inicializo_excepciones+0x1a3> call   0000f080 <__set_idt_entry>
+0000f339 <inicializo_excepciones+0x1a8> leave  
+0000f33a <inicializo_excepciones+0x1a9> cmp    $0x1,%eax
+0000f33d <inicializo_excepciones+0x1ac> jne    0000f18e <finalizo_programa>
+0000f343 <inicializo_excepciones+0x1b2> push   %ebp
+0000f344 <inicializo_excepciones+0x1b3> mov    %esp,%ebp
+0000f346 <inicializo_excepciones+0x1b5> push   $0x8f
+0000f34b <inicializo_excepciones+0x1ba> push   $0x20360
+0000f350 <inicializo_excepciones+0x1bf> push   $0x10
+0000f355 <inicializo_excepciones+0x1c4> push   $0xe
+0000f357 <inicializo_excepciones+0x1c6> call   0000f080 <__set_idt_entry>
+0000f35c <inicializo_excepciones+0x1cb> leave  
+0000f35d <inicializo_excepciones+0x1cc> cmp    $0x1,%eax
+0000f360 <inicializo_excepciones+0x1cf> jne    0000f18e <finalizo_programa>
+0000f366 <inicializo_excepciones+0x1d5> push   %ebp
+0000f367 <inicializo_excepciones+0x1d6> mov    %esp,%ebp
+0000f369 <inicializo_excepciones+0x1d8> push   $0x8f
+0000f36e <inicializo_excepciones+0x1dd> push   $0x20380
+0000f373 <inicializo_excepciones+0x1e2> push   $0x10
+0000f378 <inicializo_excepciones+0x1e7> push   $0x10
+0000f37a <inicializo_excepciones+0x1e9> call   0000f080 <__set_idt_entry>
+0000f37f <inicializo_excepciones+0x1ee> leave  
+0000f380 <inicializo_excepciones+0x1ef> cmp    $0x1,%eax
+0000f383 <inicializo_excepciones+0x1f2> jne    0000f18e <finalizo_programa>
+0000f389 <inicializo_excepciones+0x1f8> push   %ebp
+0000f38a <inicializo_excepciones+0x1f9> mov    %esp,%ebp
+0000f38c <inicializo_excepciones+0x1fb> push   $0x8f
+0000f391 <inicializo_excepciones+0x200> push   $0x203a0
+0000f396 <inicializo_excepciones+0x205> push   $0x10
+0000f39b <inicializo_excepciones+0x20a> push   $0x11
+0000f39d <inicializo_excepciones+0x20c> call   0000f080 <__set_idt_entry>
+0000f3a2 <inicializo_excepciones+0x211> leave  
+0000f3a3 <inicializo_excepciones+0x212> cmp    $0x1,%eax
+0000f3a6 <inicializo_excepciones+0x215> jne    0000f18e <finalizo_programa>
+0000f3ac <inicializo_excepciones+0x21b> push   %ebp
+0000f3ad <inicializo_excepciones+0x21c> mov    %esp,%ebp
+0000f3af <inicializo_excepciones+0x21e> push   $0x8f
+0000f3b4 <inicializo_excepciones+0x223> push   $0x203c0
+0000f3b9 <inicializo_excepciones+0x228> push   $0x10
+0000f3be <inicializo_excepciones+0x22d> push   $0x12
+0000f3c0 <inicializo_excepciones+0x22f> call   0000f080 <__set_idt_entry>
+0000f3c5 <inicializo_excepciones+0x234> leave  
+0000f3c6 <inicializo_excepciones+0x235> cmp    $0x1,%eax
+0000f3c9 <inicializo_excepciones+0x238> jne    0000f18e <finalizo_programa>
+0000f3cf <inicializo_excepciones+0x23e> push   %ebp
+0000f3d0 <inicializo_excepciones+0x23f> mov    %esp,%ebp
+0000f3d2 <inicializo_excepciones+0x241> push   $0x8f
+0000f3d7 <inicializo_excepciones+0x246> push   $0x203e0
+0000f3dc <inicializo_excepciones+0x24b> push   $0x10
+0000f3e1 <inicializo_excepciones+0x250> push   $0x13
+0000f3e3 <inicializo_excepciones+0x252> call   0000f080 <__set_idt_entry>
+0000f3e8 <inicializo_excepciones+0x257> leave  
+0000f3e9 <inicializo_excepciones+0x258> cmp    $0x1,%eax
+0000f3ec <inicializo_excepciones+0x25b> jne    0000f18e <finalizo_programa>
+0000f3f2 <inicializo_excepciones+0x261> push   %ebp
+0000f3f3 <inicializo_excepciones+0x262> mov    %esp,%ebp
+0000f3f5 <inicializo_excepciones+0x264> push   $0x8f
+0000f3fa <inicializo_excepciones+0x269> push   $0x20400
+0000f3ff <inicializo_excepciones+0x26e> push   $0x10
+0000f404 <inicializo_excepciones+0x273> push   $0x14
+0000f406 <inicializo_excepciones+0x275> call   0000f080 <__set_idt_entry>
+0000f40b <inicializo_excepciones+0x27a> leave  
+0000f40c <inicializo_excepciones+0x27b> cmp    $0x1,%eax
+0000f40f <inicializo_excepciones+0x27e> jne    0000f18e <finalizo_programa>
+0000f415 <inicializo_excepciones+0x284> push   %ebp
+0000f416 <inicializo_excepciones+0x285> mov    %esp,%ebp
+0000f418 <inicializo_excepciones+0x287> push   $0x8f
+0000f41d <inicializo_excepciones+0x28c> push   $0x20420
+0000f422 <inicializo_excepciones+0x291> push   $0x10
+0000f427 <inicializo_excepciones+0x296> push   $0x20
+0000f429 <inicializo_excepciones+0x298> call   0000f080 <__set_idt_entry>
+0000f42e <inicializo_excepciones+0x29d> leave  
+0000f42f <inicializo_excepciones+0x29e> cmp    $0x1,%eax
+0000f432 <inicializo_excepciones+0x2a1> jne    0000f18e <finalizo_programa>
+0000f438 <inicializo_excepciones+0x2a7> push   %ebp
+0000f439 <inicializo_excepciones+0x2a8> mov    %esp,%ebp
+0000f43b <inicializo_excepciones+0x2aa> push   $0x8f
+0000f440 <inicializo_excepciones+0x2af> push   $0x20440
+0000f445 <inicializo_excepciones+0x2b4> push   $0x10
+0000f44a <inicializo_excepciones+0x2b9> push   $0x21
+0000f44c <inicializo_excepciones+0x2bb> call   0000f080 <__set_idt_entry>
+0000f451 <inicializo_excepciones+0x2c0> leave  
+0000f452 <inicializo_excepciones+0x2c1> cmp    $0x1,%eax
+0000f455 <inicializo_excepciones+0x2c4> jne    0000f18e <finalizo_programa>
+0000f45b <inicializo_excepciones+0x2ca> push   %ebp
+0000f45c <inicializo_excepciones+0x2cb> mov    %esp,%ebp
+0000f45e <inicializo_excepciones+0x2cd> push   $0x8f
+0000f463 <inicializo_excepciones+0x2d2> push   $0x20460
+0000f468 <inicializo_excepciones+0x2d7> push   $0x10
+0000f46d <inicializo_excepciones+0x2dc> push   $0x22
+0000f46f <inicializo_excepciones+0x2de> call   0000f080 <__set_idt_entry>
+0000f474 <inicializo_excepciones+0x2e3> leave  
+0000f475 <inicializo_excepciones+0x2e4> cmp    $0x1,%eax
+0000f478 <inicializo_excepciones+0x2e7> jne    0000f18e <finalizo_programa>
+0000f47e <inicializo_excepciones+0x2ed> push   %ebp
+0000f47f <inicializo_excepciones+0x2ee> mov    %esp,%ebp
+0000f481 <inicializo_excepciones+0x2f0> push   $0x8f
+0000f486 <inicializo_excepciones+0x2f5> push   $0x20480
+0000f48b <inicializo_excepciones+0x2fa> push   $0x10
+0000f490 <inicializo_excepciones+0x2ff> push   $0x23
+0000f492 <inicializo_excepciones+0x301> call   0000f080 <__set_idt_entry>
+0000f497 <inicializo_excepciones+0x306> leave  
+0000f498 <inicializo_excepciones+0x307> cmp    $0x1,%eax
+0000f49b <inicializo_excepciones+0x30a> jne    0000f18e <finalizo_programa>
+0000f4a1 <inicializo_excepciones+0x310> push   %ebp
+0000f4a2 <inicializo_excepciones+0x311> mov    %esp,%ebp
+0000f4a4 <inicializo_excepciones+0x313> push   $0x8f
+0000f4a9 <inicializo_excepciones+0x318> push   $0x204a0
+0000f4ae <inicializo_excepciones+0x31d> push   $0x10
+0000f4b3 <inicializo_excepciones+0x322> push   $0x24
+0000f4b5 <inicializo_excepciones+0x324> call   0000f080 <__set_idt_entry>
+0000f4ba <inicializo_excepciones+0x329> leave  
+0000f4bb <inicializo_excepciones+0x32a> cmp    $0x1,%eax
+0000f4be <inicializo_excepciones+0x32d> jne    0000f18e <finalizo_programa>
+0000f4c4 <inicializo_excepciones+0x333> push   %ebp
+0000f4c5 <inicializo_excepciones+0x334> mov    %esp,%ebp
+0000f4c7 <inicializo_excepciones+0x336> push   $0x8f
+0000f4cc <inicializo_excepciones+0x33b> push   $0x204c0
+0000f4d1 <inicializo_excepciones+0x340> push   $0x10
+0000f4d6 <inicializo_excepciones+0x345> push   $0x25
+0000f4d8 <inicializo_excepciones+0x347> call   0000f080 <__set_idt_entry>
+0000f4dd <inicializo_excepciones+0x34c> leave  
+0000f4de <inicializo_excepciones+0x34d> cmp    $0x1,%eax
+0000f4e1 <inicializo_excepciones+0x350> jne    0000f18e <finalizo_programa>
+0000f4e7 <inicializo_excepciones+0x356> push   %ebp
+0000f4e8 <inicializo_excepciones+0x357> mov    %esp,%ebp
+0000f4ea <inicializo_excepciones+0x359> push   $0x8f
+0000f4ef <inicializo_excepciones+0x35e> push   $0x204e0
+0000f4f4 <inicializo_excepciones+0x363> push   $0x10
+0000f4f9 <inicializo_excepciones+0x368> push   $0x26
+0000f4fb <inicializo_excepciones+0x36a> call   0000f080 <__set_idt_entry>
+0000f500 <inicializo_excepciones+0x36f> leave  
+0000f501 <inicializo_excepciones+0x370> cmp    $0x1,%eax
+0000f504 <inicializo_excepciones+0x373> jne    0000f18e <finalizo_programa>
+0000f50a <inicializo_excepciones+0x379> push   %ebp
+0000f50b <inicializo_excepciones+0x37a> mov    %esp,%ebp
+0000f50d <inicializo_excepciones+0x37c> push   $0x8f
+0000f512 <inicializo_excepciones+0x381> push   $0x20500
+0000f517 <inicializo_excepciones+0x386> push   $0x10
+0000f51c <inicializo_excepciones+0x38b> push   $0x27
+0000f51e <inicializo_excepciones+0x38d> call   0000f080 <__set_idt_entry>
+0000f523 <inicializo_excepciones+0x392> leave  
+0000f524 <inicializo_excepciones+0x393> cmp    $0x1,%eax
+0000f527 <inicializo_excepciones+0x396> jne    0000f18e <finalizo_programa>
+0000f52d <inicializo_excepciones+0x39c> push   %ebp
+0000f52e <inicializo_excepciones+0x39d> mov    %esp,%ebp
+0000f530 <inicializo_excepciones+0x39f> push   $0x8f
+0000f535 <inicializo_excepciones+0x3a4> push   $0x20520
+0000f53a <inicializo_excepciones+0x3a9> push   $0x10
+0000f53f <inicializo_excepciones+0x3ae> push   $0x28
+0000f541 <inicializo_excepciones+0x3b0> call   0000f080 <__set_idt_entry>
+0000f546 <inicializo_excepciones+0x3b5> leave  
+0000f547 <inicializo_excepciones+0x3b6> cmp    $0x1,%eax
+0000f54a <inicializo_excepciones+0x3b9> jne    0000f18e <finalizo_programa>
+0000f550 <inicializo_excepciones+0x3bf> push   %ebp
+0000f551 <inicializo_excepciones+0x3c0> mov    %esp,%ebp
+0000f553 <inicializo_excepciones+0x3c2> push   $0x8f
+0000f558 <inicializo_excepciones+0x3c7> push   $0x20540
+0000f55d <inicializo_excepciones+0x3cc> push   $0x10
+0000f562 <inicializo_excepciones+0x3d1> push   $0x29
+0000f564 <inicializo_excepciones+0x3d3> call   0000f080 <__set_idt_entry>
+0000f569 <inicializo_excepciones+0x3d8> leave  
+0000f56a <inicializo_excepciones+0x3d9> cmp    $0x1,%eax
+0000f56d <inicializo_excepciones+0x3dc> jne    0000f18e <finalizo_programa>
+0000f573 <inicializo_excepciones+0x3e2> push   %ebp
+0000f574 <inicializo_excepciones+0x3e3> mov    %esp,%ebp
+0000f576 <inicializo_excepciones+0x3e5> push   $0x8f
+0000f57b <inicializo_excepciones+0x3ea> push   $0x20560
+0000f580 <inicializo_excepciones+0x3ef> push   $0x10
+0000f585 <inicializo_excepciones+0x3f4> push   $0x2a
+0000f587 <inicializo_excepciones+0x3f6> call   0000f080 <__set_idt_entry>
+0000f58c <inicializo_excepciones+0x3fb> leave  
+0000f58d <inicializo_excepciones+0x3fc> cmp    $0x1,%eax
+0000f590 <inicializo_excepciones+0x3ff> jne    0000f18e <finalizo_programa>
+0000f596 <inicializo_excepciones+0x405> push   %ebp
+0000f597 <inicializo_excepciones+0x406> mov    %esp,%ebp
+0000f599 <inicializo_excepciones+0x408> push   $0x8f
+0000f59e <inicializo_excepciones+0x40d> push   $0x20580
+0000f5a3 <inicializo_excepciones+0x412> push   $0x10
+0000f5a8 <inicializo_excepciones+0x417> push   $0x2b
+0000f5aa <inicializo_excepciones+0x419> call   0000f080 <__set_idt_entry>
+0000f5af <inicializo_excepciones+0x41e> leave  
+0000f5b0 <inicializo_excepciones+0x41f> cmp    $0x1,%eax
+0000f5b3 <inicializo_excepciones+0x422> jne    0000f18e <finalizo_programa>
+0000f5b9 <inicializo_excepciones+0x428> push   %ebp
+0000f5ba <inicializo_excepciones+0x429> mov    %esp,%ebp
+0000f5bc <inicializo_excepciones+0x42b> push   $0x8f
+0000f5c1 <inicializo_excepciones+0x430> push   $0x205a0
+0000f5c6 <inicializo_excepciones+0x435> push   $0x10
+0000f5cb <inicializo_excepciones+0x43a> push   $0x2c
+0000f5cd <inicializo_excepciones+0x43c> call   0000f080 <__set_idt_entry>
+0000f5d2 <inicializo_excepciones+0x441> leave  
+0000f5d3 <inicializo_excepciones+0x442> cmp    $0x1,%eax
+0000f5d6 <inicializo_excepciones+0x445> jne    0000f18e <finalizo_programa>
+0000f5dc <inicializo_excepciones+0x44b> push   %ebp
+0000f5dd <inicializo_excepciones+0x44c> mov    %esp,%ebp
+0000f5df <inicializo_excepciones+0x44e> push   $0x8f
+0000f5e4 <inicializo_excepciones+0x453> push   $0x205c0
+0000f5e9 <inicializo_excepciones+0x458> push   $0x10
+0000f5ee <inicializo_excepciones+0x45d> push   $0x2d
+0000f5f0 <inicializo_excepciones+0x45f> call   0000f080 <__set_idt_entry>
+0000f5f5 <inicializo_excepciones+0x464> leave  
+0000f5f6 <inicializo_excepciones+0x465> cmp    $0x1,%eax
+0000f5f9 <inicializo_excepciones+0x468> jne    0000f18e <finalizo_programa>
+0000f5ff <inicializo_excepciones+0x46e> push   %ebp
+0000f600 <inicializo_excepciones+0x46f> mov    %esp,%ebp
+0000f602 <inicializo_excepciones+0x471> push   $0x8f
+0000f607 <inicializo_excepciones+0x476> push   $0x205e0
+0000f60c <inicializo_excepciones+0x47b> push   $0x10
+0000f611 <inicializo_excepciones+0x480> push   $0x2e
+0000f613 <inicializo_excepciones+0x482> call   0000f080 <__set_idt_entry>
+0000f618 <inicializo_excepciones+0x487> leave  
+0000f619 <inicializo_excepciones+0x488> cmp    $0x1,%eax
+0000f61c <inicializo_excepciones+0x48b> jne    0000f18e <finalizo_programa>
+0000f622 <inicializo_excepciones+0x491> push   %ebp
+0000f623 <inicializo_excepciones+0x492> mov    %esp,%ebp
+0000f625 <inicializo_excepciones+0x494> push   $0x8f
+0000f62a <inicializo_excepciones+0x499> push   $0x20600
+0000f62f <inicializo_excepciones+0x49e> push   $0x10
+0000f634 <inicializo_excepciones+0x4a3> push   $0x2f
+0000f636 <inicializo_excepciones+0x4a5> call   0000f080 <__set_idt_entry>
+0000f63b <inicializo_excepciones+0x4aa> leave  
+0000f63c <inicializo_excepciones+0x4ab> cmp    $0x1,%eax
+0000f63f <inicializo_excepciones+0x4ae> jne    0000f18e <finalizo_programa>
+0000f645 <inicializo_excepciones+0x4b4> jmp    0000f187 <fin_inic_excepciones>
+
+Desensamblado de la sección .text:
+0000f650 <PIC_Config> mov    $0x11,%al
+0000f652 <PIC_Config+0x2> out    %al,$0x20
+0000f654 <PIC_Config+0x4> mov    %bl,%al
+0000f656 <PIC_Config+0x6> out    %al,$0x21
+0000f658 <PIC_Config+0x8> mov    $0x4,%al
+0000f65a <PIC_Config+0xa> out    %al,$0x21
+0000f65c <PIC_Config+0xc> mov    $0x1,%al
+0000f65e <PIC_Config+0xe> out    %al,$0x21
+0000f660 <PIC_Config+0x10> mov    $0xff,%al
+0000f662 <PIC_Config+0x12> out    %al,$0x21
+0000f664 <PIC_Config+0x14> mov    $0x11,%al
+0000f666 <PIC_Config+0x16> out    %al,$0xa0
+0000f668 <PIC_Config+0x18> mov    %bh,%al
+0000f66a <PIC_Config+0x1a> out    %al,$0xa1
+0000f66c <PIC_Config+0x1c> mov    $0x2,%al
+0000f66e <PIC_Config+0x1e> out    %al,$0xa1
+0000f670 <PIC_Config+0x20> mov    $0x1,%al
+0000f672 <PIC_Config+0x22> out    %al,$0xa1
+0000f674 <PIC_Config+0x24> mov    $0xff,%al
+0000f676 <PIC_Config+0x26> out    %al,$0xa1
+0000f678 <PIC_Config+0x28> ret    
+0000f679 <PIT_Set_1mseg> mov    $0x34,%al
+0000f67b <PIT_Set_1mseg+0x2> out    %al,$0x43
+0000f67d <PIT_Set_1mseg+0x4> mov    $0x40e604a9,%eax
+0000f682 <PIT_Set_1mseg+0x9> mov    %ah,%al
+0000f684 <PIT_Set_1mseg+0xb> out    %al,$0x40
+0000f686 <PIT_Set_1mseg+0xd> ret    
+0000f687 <RTC_Service> cmp    $0x0,%al
+0000f689 <RTC_Service+0x2> je     0000f6b2 <Fecha>
+0000f68b <RTC_Service+0x4> cmp    $0x1,%al
+0000f68d <RTC_Service+0x6> je     0000f697 <Hora>
+0000f68f <RTC_Service+0x8> jmp    0000f691 <RTC_Err_Exit>
+0000f691 <RTC_Err_Exit> mov    $0x1,%cl
+0000f693 <RTC_Err_Exit+0x2> ret    
+0000f694 <RTC_Exit> mov    $0x0,%cl
+0000f696 <RTC_Exit+0x2> ret    
+0000f697 <Hora> call   04b0f6d7 <__STACK_END_32+0x4a8f6d8>
+0000f69c <Hora+0x5> out    %al,$0x70
+0000f69e <Hora+0x7> in     $0x71,%al
+0000f6a0 <Hora+0x9> mov    %al,%dl
+0000f6a2 <Hora+0xb> mov    $0x2,%al
+0000f6a4 <Hora+0xd> out    %al,$0x70
+0000f6a6 <Hora+0xf> in     $0x71,%al
+0000f6a8 <Hora+0x11> mov    %al,%ah
+0000f6aa <Hora+0x13> xor    %al,%al
+0000f6ac <Hora+0x15> out    %al,$0x70
+0000f6ae <Hora+0x17> in     $0x71,%al
+0000f6b0 <Hora+0x19> jmp    0000f694 <RTC_Exit>
+0000f6b2 <Fecha> call   09b0f6d7 <__STACK_END_32+0x9a8f6d8>
+0000f6b7 <Fecha+0x5> out    %al,$0x70
+0000f6b9 <Fecha+0x7> in     $0x71,%al
+0000f6bb <Fecha+0x9> mov    %al,%dh
+0000f6bd <Fecha+0xb> mov    $0x8,%al
+0000f6bf <Fecha+0xd> out    %al,$0x70
+0000f6c1 <Fecha+0xf> in     $0x71,%al
+0000f6c3 <Fecha+0x11> mov    %al,%dl
+0000f6c5 <Fecha+0x13> mov    $0x7,%al
+0000f6c7 <Fecha+0x15> out    %al,$0x70
+0000f6c9 <Fecha+0x17> in     $0x71,%al
+0000f6cb <Fecha+0x19> mov    %al,%ah
+0000f6cd <Fecha+0x1b> mov    $0x6,%al
+0000f6cf <Fecha+0x1d> out    %al,$0x70
+0000f6d1 <Fecha+0x1f> in     $0x71,%al
+0000f6d3 <Fecha+0x21> jmp    0000f694 <RTC_Exit>
+0000f6d5 <RTC_disponible> mov    $0xa,%al
+0000f6d7 <RTC_disponible+0x2> out    %al,$0x70
+0000f6d9 <wait_for_free> in     $0x71,%al
+0000f6db <wait_for_free+0x2> test   $0x80,%al
+0000f6dd <wait_for_free+0x4> jne    0000f6d9 <wait_for_free>
+0000f6df <wait_for_free+0x6> ret    
+0000f6e0 <A20_Enable> mov    $0xc08effff,%eax
+0000f6e5 <A20_Enable+0x5> cmpl   $0xaa557e0e,%es:(%esi)
+0000f6ec <A20_Enable+0xc> je     0000f6fb <GateA20_Disabled>
+0000f6ee <A20_Enable+0xe> roll   (%esi)
+0000f6f0 <A20_Enable+0x10> (bad)  
+0000f6f1 <A20_Enable+0x11> jge    0000f719 <_Gate_A20+0xb>
+0000f6f3 <A20_Enable+0x13> cmpl   $0x55aa7e0e,(%esi)
+0000f6f9 <A20_Enable+0x19> jne    0000f707 <GateA20_Enabled>
+0000f6fb <GateA20_Disabled> mov    $0xdf,%al
+0000f6fd <GateA20_Disabled+0x2> call   003cf710 <__STACK_END_32+0x34f711>
+0000f702 <GateA20_Disabled+0x7> je     0000f707 <GateA20_Enabled>
+0000f704 <Fail> hlt    
+0000f705 <Fail+0x1> jmp    0000f704 <Fail>
+0000f707 <GateA20_Enabled> movl   $0xaa557dfe,(%esi)
+0000f70d <GateA20_Enabled+0x6> ret    
+0000f70e <_Gate_A20> cli    
+0000f70f <_Gate_A20+0x1> call   1075f727 <__STACK_END_32+0x106df728>
+0000f714 <_Gate_A20+0x6> mov    $0xd1,%al
+0000f716 <_Gate_A20+0x8> out    %al,$0x64
+0000f718 <_Gate_A20+0xa> call   0775f727 <__STACK_END_32+0x76df728>
+0000f71d <_Gate_A20+0xf> mov    %ah,%al
+0000f71f <_Gate_A20+0x11> out    %al,$0x60
+0000f721 <_Gate_A20+0x13> .byte 0xe8
+0000f722 <_Gate_A20+0x14> add    %eax,(%eax)
+0000f724 <gate_a20_exit> ret    
+0000f725 <_8042_empty?> push   %ecx
+0000f726 <_8042_empty?+0x1> sub    %ecx,%ecx
+0000f728 <empty_8042_01> in     $0x64,%al
+0000f72a <empty_8042_01+0x2> and    $0x2,%al
+0000f72c <empty_8042_01+0x4> loopne 0000f728 <empty_8042_01>
+0000f72e <empty_8042_01+0x6> pop    %ecx
+0000f72f <empty_8042_01+0x7> ret    

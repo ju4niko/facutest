@@ -1,0 +1,38 @@
+     1                                  SECTION .kernel32 progbits
+     2                                  
+     3                                  USE32									; Codigo de 32bits
+     4                                  
+     5                                  ; Funciones externas
+     6                                  EXTERN	clrsrc
+     7                                  EXTERN	print
+     8                                  
+     9                                  GLOBAL	kernel32_init
+    10                                  
+    11                                  ; Variables
+    12 00000000 486F6C61206D756E64-     const_string	db	'Hola mundo'
+    13 00000009 6F                 
+    14 0000000A 00                      color		db	0x00
+    15                                  
+    16                                  kernel32_init:	
+    17                                  	; Preparo la pila y llamo a la funcion para limpiar la pantalla
+    18 0000000B 55                      	push	ebp
+    19 0000000C 89E5                    	mov	ebp,esp
+    20 0000000E E8(00000000)            	call	clrsrc
+    21 00000013 89EC                    	mov	esp,ebp
+    22 00000015 5D                      	pop	ebp
+    23                                  	
+    24                                  	; Preparo la pila y llamo a la funcion para escribir en pantalla
+    25 00000016 55                      	push	ebp
+    26 00000017 89E5                    	mov	ebp,esp
+    27                                  	; Cargo la pila con los parametros de la funcion para escribir la pantalla
+    28 00000019 68[0A000000]            	push	color							; Cargo el color
+    29 0000001E 6A00                    	push	0x00							; Cargo la fila donde comenzar escribir
+    30 00000020 6A00                    	push	0x00							; Cargo la columna donde comenzar a escribir
+    31 00000022 68[00000000]            	push	const_string						; Cargo el string a escribir
+    32 00000027 E8(00000000)            	call	print
+    33 0000002C 89EC                    	mov	esp,ebp
+    34 0000002E 5D                      	pop	ebp
+    35                                  	
+    36                                  ACA:									; Termino el programa
+    37 0000002F F4                      	hlt
+    38 00000030 EBFD                    	jmp ACA

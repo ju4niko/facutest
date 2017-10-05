@@ -1,0 +1,39 @@
+     1                                  SECTION .start16 progbits
+     2                                  
+     3                                  USE16									; Codigo de 16bits
+     4                                  
+     5                                  EXTERN	__STACK_START_16
+     6                                  EXTERN	__STACK_END_16
+     7                                  EXTERN	start32_launcher						; Etiqueta externa donde comienza la inicializacion en 32bits
+     8                                  EXTERN	GDTR								; Direccion del registro de la tabla de descriptores globales
+     9                                  EXTERN	CS_SEL_16							; Direccion del selector de segmento de codigo de 16bits
+    10                                  
+    11                                  GLOBAL	start16_inic							; Hago visible la etiqueta para que se pueda utilizar en el reset
+    12                                  
+    13                                  start16_inic:
+    14                                  	; Igualo ds a cs para asegurarme que no esten desfazado
+    15 00000000 8CC8                    	mov		ax,cs						
+    16 00000002 8ED8                    	mov		ds,ax
+    17                                  
+    18 00000004 0F0116[0000]            	lgdt [GDTR]							; Cargo la gdt
+    19                                  
+    20                                  	; Inicializacion de la pila
+    21 00000009 B8[0000]                	mov		ax,__STACK_START_16
+    22 0000000C 8ED0                    	mov 		ss,ax						; Cargo en el segmento de stack el inicio de la pila de 16bits
+    23 0000000E BC[0000]                	mov 		sp,__STACK_END_16				; Cargo en el stack pointer el final de la pila de 16bits
+    24                                  
+    25                                  	; Paso a modo protegido al colocar 1 en el bit0 del cr0
+    26 00000011 0F20C0                  	mov		eax,cr0
+    27 00000014 6683C801                	or		eax,0x01
+    28 00000018 0F22C0                  	mov		cr0,eax
+    29                                  
+    30                                  	; Limpio Pipeline
+    31 0000001B EB00                    	jmp		flush_prefetch_queue
+    32                                  
+    33                                  flush_prefetch_queue:
+    34                                  	; Cargo la pila como cuando aparece una int, de esta manera entro definitivamente en modo protegido con datos y direcciones de 32bits
+    35 0000001D B8[0000]                	mov		ax,start32_launcher				; Cargo en el acumulador A la etiqueta donde se encuentra el codigo en 32bits
+    36 00000020 9C                      	pushf								; Cargo los FLAGS en la pila
+    37 00000021 68[0000]                	push		word CS_SEL_16					; Cargo el selector de segmento de codigo de 16bits en la pila
+    38 00000024 50                      	push		ax
+    39 00000025 CF                      	iret								; Al igual que al volver de una int, vuelvo a cargar los registros con los valores del stack, por esto salto a start32_launcher

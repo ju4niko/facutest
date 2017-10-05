@@ -1,0 +1,450 @@
+     1                                  SECTION  .idt_ctrlrs_32_asm progbits
+     2                                  
+     3                                  USE32
+     4                                  
+     5                                  GLOBAL	EXCEPTION_DE							; Division por 0
+     6                                  GLOBAL	EXCEPTION_DB							; Excepcion de debug
+     7                                  GLOBAL	EXCEPTION_NMI							; Generada por un pin externo
+     8                                  GLOBAL	EXCEPTION_BP							; Ejecucion de instruccion de breakpoint
+     9                                  GLOBAL	EXCEPTION_OF							; Overflow cuando se ejecutaba instruccion INTO
+    10                                  GLOBAL	EXCEPTION_BR							; Rango excedido
+    11                                  GLOBAL	EXCEPTION_UD							; Opcode invalido
+    12                                  GLOBAL	EXCEPTION_NM
+    13                                  GLOBAL	EXCEPTION_DF
+    14                                  GLOBAL	EXCEPTION_CO
+    15                                  GLOBAL	EXCEPTION_TS
+    16                                  GLOBAL	EXCEPTION_NP
+    17                                  GLOBAL	EXCEPTION_SS
+    18                                  GLOBAL	EXCEPTION_GP
+    19                                  GLOBAL	EXCEPTION_PF
+    20                                  GLOBAL	EXCEPTION_MF
+    21                                  GLOBAL	EXCEPTION_AC
+    22                                  GLOBAL	EXCEPTION_MC
+    23                                  GLOBAL	EXCEPTION_XM
+    24                                  GLOBAL	EXCEPTION_VE
+    25                                  GLOBAL	INT_0
+    26                                  GLOBAL	INT_1
+    27                                  GLOBAL	INT_2
+    28                                  GLOBAL	INT_3
+    29                                  GLOBAL	INT_4
+    30                                  GLOBAL	INT_5
+    31                                  GLOBAL	INT_6
+    32                                  GLOBAL	INT_7
+    33                                  GLOBAL	INT_8
+    34                                  GLOBAL	INT_9
+    35                                  GLOBAL	INT_10
+    36                                  GLOBAL	INT_11
+    37                                  GLOBAL	INT_12
+    38                                  GLOBAL	INT_13
+    39                                  GLOBAL	INT_14
+    40                                  GLOBAL	INT_15
+    41                                  
+    42                                  EXTERN print
+    43                                  
+    44 00000000 457863657063696F6E-     ex_num0		db	'Excepcion generada: 0'
+    45 00000009 2067656E6572616461-
+    46 00000012 3A2030             
+    47 00000015 457863657063696F6E-     ex_num1 	db	'Excepcion generada: 1'
+    48 0000001E 2067656E6572616461-
+    49 00000027 3A2031             
+    50 0000002A 457863657063696F6E-     ex_num2 	db	'Excepcion generada: 2'
+    51 00000033 2067656E6572616461-
+    52 0000003C 3A2032             
+    53 0000003F 457863657063696F6E-     ex_num3 	db	'Excepcion generada: 3'
+    54 00000048 2067656E6572616461-
+    55 00000051 3A2033             
+    56 00000054 457863657063696F6E-     ex_num4 	db	'Excepcion generada: 4'
+    57 0000005D 2067656E6572616461-
+    58 00000066 3A2034             
+    59 00000069 457863657063696F6E-     ex_num5 	db	'Excepcion generada: 5'
+    60 00000072 2067656E6572616461-
+    61 0000007B 3A2035             
+    62 0000007E 457863657063696F6E-     ex_num6 	db	'Excepcion generada: 6'
+    63 00000087 2067656E6572616461-
+    64 00000090 3A2036             
+    65 00000093 457863657063696F6E-     ex_num7 	db	'Excepcion generada: 7'
+    66 0000009C 2067656E6572616461-
+    67 000000A5 3A2037             
+    68 000000A8 457863657063696F6E-     ex_num8 	db	'Excepcion generada: 8'
+    69 000000B1 2067656E6572616461-
+    70 000000BA 3A2038             
+    71 000000BD 457863657063696F6E-     ex_num10 	db	'Excepcion generada: 10'
+    72 000000C6 2067656E6572616461-
+    73 000000CF 3A203130           
+    74 000000D3 457863657063696F6E-     ex_num11	db	'Excepcion generada: 11'
+    75 000000DC 2067656E6572616461-
+    76 000000E5 3A203131           
+    77 000000E9 457863657063696F6E-     ex_num12 	db	'Excepcion generada: 12'
+    78 000000F2 2067656E6572616461-
+    79 000000FB 3A203132           
+    80 000000FF 457863657063696F6E-     ex_num13 	db	'Excepcion generada: 13'
+    81 00000108 2067656E6572616461-
+    82 00000111 3A203133           
+    83 00000115 457863657063696F6E-     ex_num14	db	'Excepcion generada: 14'
+    84 0000011E 2067656E6572616461-
+    85 00000127 3A203134           
+    86 0000012B 457863657063696F6E-     ex_num16	db	'Excepcion generada: 16'
+    87 00000134 2067656E6572616461-
+    88 0000013D 3A203136           
+    89 00000141 457863657063696F6E-     ex_num17	db	'Excepcion generada: 17'
+    90 0000014A 2067656E6572616461-
+    91 00000153 3A203137           
+    92 00000157 457863657063696F6E-     ex_num18	db	'Excepcion generada: 18'
+    93 00000160 2067656E6572616461-
+    94 00000169 3A203138           
+    95 0000016D 457863657063696F6E-     ex_num19	db	'Excepcion generada: 19'
+    96 00000176 2067656E6572616461-
+    97 0000017F 3A203139           
+    98 00000183 457863657063696F6E-     ex_num20	db	'Excepcion generada: 20'
+    99 0000018C 2067656E6572616461-
+   100 00000195 3A203230           
+   101 00000199 00                      color		db	0x00
+   102                                  
+   103                                  
+   104                                  dummy_entry:
+   105 0000019A 50                      	push	eax
+   106 0000019B F4                      	hlt
+   107                                  			
+   108 0000019C B020                    	mov	al,0x20
+   109 0000019E E620                    	out	0x20,al
+   110                                  
+   111 000001A0 58                      	pop	eax
+   112 000001A1 CF                      	iretd
+   113                                  FIN:
+   114 000001A2 F4                      	hlt
+   115 000001A3 EBFD                    	jmp	FIN
+   116                                  
+   117                                  
+   118                                  HANDLERS_IDT_START	equ	$
+   119                                  
+   120 000001A5 90<rept>                align 32
+   121                                  EXCEPTION_DE		equ	$
+   122 000001C0 55                      			push	ebp
+   123 000001C1 89E5                    			mov	ebp,esp
+   124 000001C3 68[99010000]            			push	color
+   125 000001C8 6A00                    			push	0x00
+   126 000001CA 6A00                    			push	0x00
+   127 000001CC 68[00000000]            			push	ex_num0
+   128 000001D1 E8(00000000)            			call	print
+   129 000001D6 89EC                    			mov	esp,ebp
+   130 000001D8 5D                      			pop	ebp
+   131 000001D9 F4                      			hlt
+   132 000001DA CF                      			iretd
+   133                                  			
+   134 000001DB 90<rept>                align 32
+   135                                  EXCEPTION_DB		equ	$
+   136 000001E0 55                      			push	ebp
+   137 000001E1 89E5                    			mov	ebp,esp
+   138 000001E3 68[99010000]            			push	color
+   139 000001E8 6A00                    			push	0x00
+   140 000001EA 6A00                    			push	0x00
+   141 000001EC 68[15000000]            			push	ex_num1
+   142 000001F1 E8(00000000)            			call	print
+   143 000001F6 89EC                    			mov	esp,ebp
+   144 000001F8 5D                      			pop	ebp
+   145 000001F9 F4                      			hlt
+   146 000001FA CF                      			iretd
+   147                                  			
+   148 000001FB 90<rept>                align 32
+   149                                  EXCEPTION_NMI		equ	$
+   150 00000200 55                      			push	ebp
+   151 00000201 89E5                    			mov	ebp,esp
+   152 00000203 68[99010000]            			push	color
+   153 00000208 6A00                    			push	0x00
+   154 0000020A 6A00                    			push	0x00
+   155 0000020C 68[2A000000]            			push	ex_num2
+   156 00000211 E8(00000000)            			call	print
+   157 00000216 89EC                    			mov	esp,ebp
+   158 00000218 5D                      			pop	ebp
+   159 00000219 F4                      			hlt
+   160 0000021A CF                      			iretd
+   161                                  			
+   162 0000021B 90<rept>                align 32
+   163                                  EXCEPTION_BP 		equ 	$
+   164 00000220 55                      			push	ebp
+   165 00000221 89E5                    			mov	ebp,esp
+   166 00000223 68[99010000]            			push	color
+   167 00000228 6A00                    			push	0x00
+   168 0000022A 6A00                    			push	0x00
+   169 0000022C 68[3F000000]            			push	ex_num3
+   170 00000231 E8(00000000)            			call	print
+   171 00000236 89EC                    			mov	esp,ebp
+   172 00000238 5D                      			pop	ebp
+   173 00000239 F4                      			hlt
+   174 0000023A CF                      			iretd
+   175                                  			
+   176 0000023B 90<rept>                align 32
+   177                                  EXCEPTION_OF		equ	$
+   178 00000240 55                      			push	ebp
+   179 00000241 89E5                    			mov	ebp,esp
+   180 00000243 68[99010000]            			push	color
+   181 00000248 6A00                    			push	0x00
+   182 0000024A 6A00                    			push	0x00
+   183 0000024C 68[54000000]            			push	ex_num4
+   184 00000251 E8(00000000)            			call	print
+   185 00000256 89EC                    			mov	esp,ebp
+   186 00000258 5D                      			pop	ebp
+   187 00000259 F4                      			hlt
+   188 0000025A CF                      			iretd
+   189                                  			
+   190 0000025B 90<rept>                align 32
+   191                                  EXCEPTION_BR		equ	$
+   192 00000260 55                      			push	ebp
+   193 00000261 89E5                    			mov	ebp,esp
+   194 00000263 68[99010000]            			push	color
+   195 00000268 6A00                    			push	0x00
+   196 0000026A 6A00                    			push	0x00
+   197 0000026C 68[69000000]            			push	ex_num5
+   198 00000271 E8(00000000)            			call	print
+   199 00000276 89EC                    			mov	esp,ebp
+   200 00000278 5D                      			pop	ebp
+   201 00000279 F4                      			hlt
+   202 0000027A CF                      			iretd
+   203                                  			
+   204 0000027B 90<rept>                align 32
+   205                                  EXCEPTION_UD		equ	$
+   206 00000280 55                      			push	ebp
+   207 00000281 89E5                    			mov	ebp,esp
+   208 00000283 68[99010000]            			push	color
+   209 00000288 6A00                    			push	0x00
+   210 0000028A 6A00                    			push	0x00
+   211 0000028C 68[7E000000]            			push	ex_num6
+   212 00000291 E8(00000000)            			call	print
+   213 00000296 89EC                    			mov	esp,ebp
+   214 00000298 5D                      			pop	ebp
+   215 00000299 F4                      			hlt
+   216 0000029A CF                      			iretd
+   217                                  			
+   218 0000029B 90<rept>                align 32
+   219                                  EXCEPTION_NM		equ	$
+   220 000002A0 55                      			push	ebp
+   221 000002A1 89E5                    			mov	ebp,esp
+   222 000002A3 68[99010000]            			push	color
+   223 000002A8 6A00                    			push	0x00
+   224 000002AA 6A00                    			push	0x00
+   225 000002AC 68[93000000]            			push	ex_num7
+   226 000002B1 E8(00000000)            			call	print
+   227 000002B6 89EC                    			mov	esp,ebp
+   228 000002B8 5D                      			pop	ebp
+   229 000002B9 F4                      			hlt
+   230 000002BA CF                      			iretd
+   231                                  			
+   232 000002BB 90<rept>                align 32
+   233                                  EXCEPTION_DF		equ	$
+   234 000002C0 55                      			push	ebp
+   235 000002C1 89E5                    			mov	ebp,esp
+   236 000002C3 68[99010000]            			push	color
+   237 000002C8 6A00                    			push	0x00
+   238 000002CA 6A00                    			push	0x00
+   239 000002CC 68[A8000000]            			push	ex_num8
+   240 000002D1 E8(00000000)            			call	print
+   241 000002D6 89EC                    			mov	esp,ebp
+   242 000002D8 5D                      			pop	ebp
+   243 000002D9 F4                      			hlt
+   244 000002DA CF                      			iretd
+   245                                  			
+   246 000002DB 90<rept>                align 32
+   247                                  EXCEPTION_TS		equ	$
+   248 000002E0 55                      			push	ebp
+   249 000002E1 89E5                    			mov	ebp,esp
+   250 000002E3 68[99010000]            			push	color
+   251 000002E8 6A00                    			push	0x00
+   252 000002EA 6A00                    			push	0x00
+   253 000002EC 68[BD000000]            			push	ex_num10
+   254 000002F1 E8(00000000)            			call	print
+   255 000002F6 89EC                    			mov	esp,ebp
+   256 000002F8 5D                      			pop	ebp
+   257 000002F9 F4                      			hlt
+   258 000002FA CF                      			iretd
+   259                                  			
+   260 000002FB 90<rept>                align 32
+   261                                  EXCEPTION_NP		equ	$
+   262 00000300 55                      			push	ebp
+   263 00000301 89E5                    			mov	ebp,esp
+   264 00000303 68[99010000]            			push	color
+   265 00000308 6A00                    			push	0x00
+   266 0000030A 6A00                    			push	0x00
+   267 0000030C 68[D3000000]            			push	ex_num11
+   268 00000311 E8(00000000)            			call	print
+   269 00000316 89EC                    			mov	esp,ebp
+   270 00000318 5D                      			pop	ebp
+   271 00000319 F4                      			hlt
+   272 0000031A CF                      			iretd
+   273                                  			
+   274 0000031B 90<rept>                align 32
+   275                                  EXCEPTION_SS		equ	$
+   276 00000320 55                      			push	ebp
+   277 00000321 89E5                    			mov	ebp,esp
+   278 00000323 68[99010000]            			push	color
+   279 00000328 6A00                    			push	0x00
+   280 0000032A 6A00                    			push	0x00
+   281 0000032C 68[E9000000]            			push	ex_num12
+   282 00000331 E8(00000000)            			call	print
+   283 00000336 89EC                    			mov	esp,ebp
+   284 00000338 5D                      			pop	ebp
+   285 00000339 F4                      			hlt
+   286 0000033A CF                      			iretd
+   287                                  			
+   288 0000033B 90<rept>                align 32
+   289                                  EXCEPTION_GP		equ	$
+   290 00000340 55                      			push	ebp
+   291 00000341 89E5                    			mov	ebp,esp
+   292 00000343 68[99010000]            			push	color
+   293 00000348 6A00                    			push	0x00
+   294 0000034A 6A00                    			push	0x00
+   295 0000034C 68[FF000000]            			push	ex_num13
+   296 00000351 E8(00000000)            			call	print
+   297 00000356 89EC                    			mov	esp,ebp
+   298 00000358 5D                      			pop	ebp
+   299 00000359 F4                      			hlt
+   300 0000035A CF                      			iretd
+   301                                  			
+   302 0000035B 90<rept>                align 32
+   303                                  EXCEPTION_PF		equ	$
+   304 00000360 55                      			push	ebp
+   305 00000361 89E5                    			mov	ebp,esp
+   306 00000363 68[99010000]            			push	color
+   307 00000368 6A00                    			push	0x00
+   308 0000036A 6A00                    			push	0x00
+   309 0000036C 68[15010000]            			push	ex_num14
+   310 00000371 E8(00000000)            			call	print
+   311 00000376 89EC                    			mov	esp,ebp
+   312 00000378 5D                      			pop	ebp
+   313 00000379 F4                      			hlt
+   314 0000037A CF                      			iretd
+   315                                  			
+   316 0000037B 90<rept>                align 32
+   317                                  EXCEPTION_MF		equ	$
+   318 00000380 55                      			push	ebp
+   319 00000381 89E5                    			mov	ebp,esp
+   320 00000383 68[99010000]            			push	color
+   321 00000388 6A00                    			push	0x00
+   322 0000038A 6A00                    			push	0x00
+   323 0000038C 68[2B010000]            			push	ex_num16
+   324 00000391 E8(00000000)            			call	print
+   325 00000396 89EC                    			mov	esp,ebp
+   326 00000398 5D                      			pop	ebp
+   327 00000399 F4                      			hlt
+   328 0000039A CF                      			iretd
+   329                                  			
+   330 0000039B 90<rept>                align 32
+   331                                  EXCEPTION_AC		equ	$
+   332 000003A0 55                      			push	ebp
+   333 000003A1 89E5                    			mov	ebp,esp
+   334 000003A3 68[99010000]            			push	color
+   335 000003A8 6A00                    			push	0x00
+   336 000003AA 6A00                    			push	0x00
+   337 000003AC 68[41010000]            			push	ex_num17
+   338 000003B1 E8(00000000)            			call	print
+   339 000003B6 89EC                    			mov	esp,ebp
+   340 000003B8 5D                      			pop	ebp
+   341 000003B9 F4                      			hlt
+   342 000003BA CF                      			iretd
+   343                                  			
+   344 000003BB 90<rept>                align 32
+   345                                  EXCEPTION_MC		equ	$
+   346 000003C0 55                      			push	ebp
+   347 000003C1 89E5                    			mov	ebp,esp
+   348 000003C3 68[99010000]            			push	color
+   349 000003C8 6A00                    			push	0x00
+   350 000003CA 6A00                    			push	0x00
+   351 000003CC 68[57010000]            			push	ex_num18
+   352 000003D1 E8(00000000)            			call	print
+   353 000003D6 89EC                    			mov	esp,ebp
+   354 000003D8 5D                      			pop	ebp
+   355 000003D9 F4                      			hlt
+   356 000003DA CF                      			iretd
+   357                                  			
+   358 000003DB 90<rept>                align 32
+   359                                  EXCEPTION_XM		equ	$
+   360 000003E0 55                      			push	ebp
+   361 000003E1 89E5                    			mov	ebp,esp
+   362 000003E3 68[99010000]            			push	color
+   363 000003E8 6A00                    			push	0x00
+   364 000003EA 6A00                    			push	0x00
+   365 000003EC 68[6D010000]            			push	ex_num19
+   366 000003F1 E8(00000000)            			call	print
+   367 000003F6 89EC                    			mov	esp,ebp
+   368 000003F8 5D                      			pop	ebp
+   369 000003F9 F4                      			hlt
+   370 000003FA CF                      			iretd
+   371                                  			
+   372 000003FB 90<rept>                align 32
+   373                                  EXCEPTION_VE		equ	$
+   374 00000400 55                      			push	ebp
+   375 00000401 89E5                    			mov	ebp,esp
+   376 00000403 68[99010000]            			push	color
+   377 00000408 6A00                    			push	0x00
+   378 0000040A 6A00                    			push	0x00
+   379 0000040C 68[83010000]            			push	ex_num20
+   380 00000411 E8(00000000)            			call	print
+   381 00000416 89EC                    			mov	esp,ebp
+   382 00000418 5D                      			pop	ebp
+   383 00000419 F4                      			hlt
+   384 0000041A CF                      			iretd
+   385                                  			
+   386 0000041B 90<rept>                align 32
+   387                                  INT_0			equ	$
+   388 00000420 E975FDFFFF              			jmp	dummy_entry
+   389                                  			
+   390 00000425 90<rept>                align 32
+   391                                  INT_1			equ	$
+   392 00000440 E955FDFFFF              			jmp	dummy_entry
+   393                                  			
+   394 00000445 90<rept>                align 32
+   395                                  INT_2			equ	$
+   396 00000460 E935FDFFFF              			jmp	dummy_entry
+   397                                  			
+   398 00000465 90<rept>                align 32
+   399                                  INT_3			equ	$
+   400 00000480 E915FDFFFF              			jmp	dummy_entry
+   401                                  			
+   402 00000485 90<rept>                align 32
+   403                                  INT_4			equ	$
+   404 000004A0 E9F5FCFFFF              			jmp	dummy_entry
+   405                                  			
+   406 000004A5 90<rept>                align 32
+   407                                  INT_5			equ	$
+   408 000004C0 E9D5FCFFFF              			jmp	dummy_entry
+   409                                  			
+   410 000004C5 90<rept>                align 32
+   411                                  INT_6			equ	$
+   412 000004E0 E9B5FCFFFF              			jmp	dummy_entry
+   413                                  			
+   414 000004E5 90<rept>                align 32
+   415                                  INT_7			equ	$
+   416 00000500 E995FCFFFF              			jmp	dummy_entry
+   417                                  			
+   418 00000505 90<rept>                align 32
+   419                                  INT_8			equ	$
+   420 00000520 E975FCFFFF              			jmp	dummy_entry
+   421                                  			
+   422 00000525 90<rept>                align 32
+   423                                  INT_9			equ	$
+   424 00000540 E955FCFFFF              			jmp	dummy_entry
+   425                                  			
+   426 00000545 90<rept>                align 32
+   427                                  INT_10			equ	$
+   428 00000560 E935FCFFFF              			jmp	dummy_entry
+   429                                  			
+   430 00000565 90<rept>                align 32
+   431                                  INT_11			equ	$
+   432 00000580 E915FCFFFF              			jmp	dummy_entry
+   433                                  			
+   434 00000585 90<rept>                align 32
+   435                                  INT_12			equ	$
+   436 000005A0 E9F5FBFFFF              			jmp	dummy_entry
+   437                                  			
+   438 000005A5 90<rept>                align 32
+   439                                  INT_13			equ	$
+   440 000005C0 E9D5FBFFFF              			jmp	dummy_entry
+   441                                  			
+   442 000005C5 90<rept>                align 32
+   443                                  INT_14			equ	$
+   444 000005E0 E9B5FBFFFF              			jmp	dummy_entry
+   445                                  			
+   446 000005E5 90<rept>                align 32
+   447                                  INT_15			equ	$
+   448 00000600 E995FBFFFF              			jmp	dummy_entry
+   449                                  			
+   450                                  EXCEPTION_DUMMY		equ	$-HANDLERS_IDT_START

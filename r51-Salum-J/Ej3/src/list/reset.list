@@ -1,0 +1,10 @@
+     1                                  SECTION	.reset
+     2                                  
+     3                                  USE16									; Codigo de 16bits
+     4                                  
+     5                                  EXTERN	start16_inic							; Etiqueta externa donde comienza la inicializacion en 16bits
+     6                                  
+     7                                  reset_inic:
+     8 00000000 FA                      	cli								; Limpio flag de interrupciones (deshabilito interrupciones por hardware)
+     9 00000001 FC                      	cld								; Limpio flag de direcciones
+    10 00000002 E9(0000)                	jmp	start16_inic						; Salto al comienzo de codigo de 16bits con el procesador en modo real

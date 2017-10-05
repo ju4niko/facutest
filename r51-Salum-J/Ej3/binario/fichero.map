@@ -1,0 +1,155 @@
+
+Configuración de la Memoria
+
+Nombre           Origen             Longitud           Atributos
+ram              0x0000000000000000 0x00000000ffff0000 !x
+rom32            0x00000000ffff0000 0x000000000000f000 xr
+rom16            0x000000000000f000 0x0000000000000fff xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Guión del enlazador y mapa de memoria
+
+                0x0000000000009000                __STACK_START_16 = 0x9000
+                0x000000000000ffff                __STACK_END_16 = 0xffff
+                0x0000000000070000                __STACK_START_32 = 0x70000
+                0x000000000007ffff                __STACK_END_32 = 0x7ffff
+                0x0000000000003fff                __STACK_SIZE_32 = ((__STACK_END_32 - __STACK_START_32) / 0x4)
+                0x0000000000000000                __IDT_START = 0x0
+                0x0000000000000100                __IDT_ENTRIES = 0x100
+                0x0000000000000800                __IDT_END = (__IDT_START + (__IDT_ENTRIES * 0x8))
+                0x00000000ffff0000                vma_kernel32 = 0xffff0000
+
+.codigo_kernel32
+                0x00000000ffff0000       0xff
+ *(.kernel32)
+ .kernel32      0x00000000ffff0000       0xc4 src/elf/funciones_pantalla.elf
+                0x00000000ffff0000                clrsrc
+                0x00000000ffff0035                print
+ .kernel32      0x00000000ffff00c4       0x3b src/elf/kernel.elf
+                0x00000000ffff00cf                kernel32_init
+                0x0000000000020000                ___idt_ctrlrs_vma_st = 0x20000
+
+.codigo_idt_ctrlrs
+                0x0000000000020000      0x605 dirección de carga 0x00000000ffff00ff
+ *(.idt_ctrlrs_32_asm)
+ .idt_ctrlrs_32_asm
+                0x0000000000020000      0x605 src/elf/handlers_asm32.elf
+                0x00000000000201c0                EXCEPTION_DE
+                0x00000000000201e0                EXCEPTION_DB
+                0x0000000000020200                EXCEPTION_NMI
+                0x0000000000020220                EXCEPTION_BP
+                0x0000000000020240                EXCEPTION_OF
+                0x0000000000020260                EXCEPTION_BR
+                0x0000000000020280                EXCEPTION_UD
+                0x00000000000202a0                EXCEPTION_NM
+                0x00000000000202c0                EXCEPTION_DF
+                0x00000000000202e0                EXCEPTION_TS
+                0x0000000000020300                EXCEPTION_NP
+                0x0000000000020320                EXCEPTION_SS
+                0x0000000000020340                EXCEPTION_GP
+                0x0000000000020360                EXCEPTION_PF
+                0x0000000000020380                EXCEPTION_MF
+                0x00000000000203a0                EXCEPTION_AC
+                0x00000000000203c0                EXCEPTION_MC
+                0x00000000000203e0                EXCEPTION_XM
+                0x0000000000020400                EXCEPTION_VE
+                0x0000000000020420                INT_0
+                0x0000000000020440                INT_1
+                0x0000000000020460                INT_2
+                0x0000000000020480                INT_3
+                0x00000000000204a0                INT_4
+                0x00000000000204c0                INT_5
+                0x00000000000204e0                INT_6
+                0x0000000000020500                INT_7
+                0x0000000000020520                INT_8
+                0x0000000000020540                INT_9
+                0x0000000000020560                INT_10
+                0x0000000000020580                INT_11
+                0x00000000000205a0                INT_12
+                0x00000000000205c0                INT_13
+                0x00000000000205e0                INT_14
+                0x0000000000020600                INT_15
+                0x00000000ffff00ff                ___idt_ctrlrs_lma_st = LOADADDR (.codigo_idt_ctrlrs)
+                0x0000000000000605                ___idt_ctrlrs_size = SIZEOF (.codigo_idt_ctrlrs)
+                0x000000000000f000                vma_inic32 = 0xf000
+
+.codigo32       0x000000000000f000      0x64a dirección de carga 0x00000000fffff000
+ *(.start32)
+ .start32       0x000000000000f000       0xf6 src/elf/funciones_idt.elf
+                0x000000000000f00c                __init_idt
+                0x000000000000f080                __set_idt_entry
+ .start32       0x000000000000f0f6       0x3c src/elf/funciones_memoria.elf
+                0x000000000000f0f6                __fast_memcpy
+ .start32       0x000000000000f132      0x518 src/elf/start32.elf
+                0x000000000000f132                start32_launcher
+                0x000000000000f800                vma_inic16 = 0xf800
+
+.text           0x000000000000f650       0xe0 dirección de carga 0x00000000fffff650
+ .text          0x000000000000f650        0x0 src/elf/funciones_pantalla.elf
+ .text          0x000000000000f650        0x0 src/elf/funciones_idt.elf
+ .text          0x000000000000f650        0x0 src/elf/funciones_memoria.elf
+ .text          0x000000000000f650       0xe0 src/elf/utils16.elf
+                0x000000000000f650                PIC_Config
+                0x000000000000f679                PIT_Set_1mseg
+                0x000000000000f687                RTC_Service
+                0x000000000000f6e0                A20_Enable
+
+.codigo16       0x000000000000f800       0x26 dirección de carga 0x00000000fffff800
+ *(.start16)
+ .start16       0x000000000000f800       0x26 src/elf/start16.elf
+                0x000000000000f800                start16_inic
+                0x000000000000fd00                vma_datos = 0xfd00
+
+.tablas         0x000000000000fd00       0x26 dirección de carga 0x00000000fffffd00
+ *(.sys_tables*)
+ .sys_tables    0x000000000000fd00       0x26 src/elf/tablas.elf
+                0x000000000000fd20                GDTR
+                0x000000000000fff0                vma_reset = 0xfff0
+
+.codigo_reset   0x000000000000fff0        0x5 dirección de carga 0x00000000fffffff0
+ *(.reset)
+ .reset         0x000000000000fff0        0x5 src/elf/reset.elf
+
+.fill_rom16     0x000000000000fff5        0xa dirección de carga 0x00000000fffffff5
+ FILL mask 0x90
+                0x000000000000fffe                . = ((ORIGIN (rom16) + LENGTH (rom16)) - 0x1)
+ *fill*         0x000000000000fff5        0x9 90
+                0x000000000000fffe        0x1 BYTE 0x90
+
+.end_rom16      0x000000000000ffff        0x1 dirección de carga 0x00000000ffffffff
+                0x000000000000ffff        0x1 BYTE 0x90
+LOAD src/elf/funciones_pantalla.elf
+LOAD src/elf/funciones_idt.elf
+LOAD src/elf/funciones_memoria.elf
+LOAD src/elf/reset.elf
+LOAD src/elf/start16.elf
+LOAD src/elf/utils16.elf
+LOAD src/elf/handlers_asm32.elf
+LOAD src/elf/tablas.elf
+LOAD src/elf/kernel.elf
+LOAD src/elf/start32.elf
+OUTPUT(binario/fichero.bin binary)
+
+.data           0x0000000000010000        0x0 dirección de carga 0x0000000100000000
+ .data          0x0000000000010000        0x0 src/elf/funciones_pantalla.elf
+ .data          0x0000000000010000        0x0 src/elf/funciones_idt.elf
+ .data          0x0000000000010000        0x0 src/elf/funciones_memoria.elf
+
+.bss            0x0000000000010000        0x0 dirección de carga 0x0000000100000000
+ .bss           0x0000000000010000        0x0 src/elf/funciones_pantalla.elf
+ .bss           0x0000000000010000        0x0 src/elf/funciones_idt.elf
+ .bss           0x0000000000010000        0x0 src/elf/funciones_memoria.elf
+
+.comment        0x0000000000000000       0x9f
+ .comment       0x0000000000000000       0x35 src/elf/funciones_pantalla.elf
+ .comment       0x0000000000000035       0x35 src/elf/funciones_idt.elf
+ .comment       0x000000000000006a       0x35 src/elf/funciones_memoria.elf
+
+.note.GNU-stack
+                0x0000000000000000        0x0
+ .note.GNU-stack
+                0x0000000000000000        0x0 src/elf/funciones_pantalla.elf
+ .note.GNU-stack
+                0x0000000000000000        0x0 src/elf/funciones_idt.elf
+ .note.GNU-stack
+                0x0000000000000000        0x0 src/elf/funciones_memoria.elf

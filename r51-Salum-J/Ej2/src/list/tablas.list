@@ -1,0 +1,70 @@
+     1                                  %define BOOT_SEG 0xF0000
+     2                                  
+     3                                  SECTION .sys_tables progbits
+     4                                  
+     5                                  ; Hago visible las direcciones importantes para manejar los distintos datos
+     6                                  GLOBAL	GDTR
+     7                                  GLOBAL	CS_SEL_16
+     8                                  GLOBAL	CS_SEL_32
+     9                                  GLOBAL	DS_SEL
+    10                                  
+    11                                  GDT:
+    12                                  	NULL_SEL	equ		$-GDT
+    13 00000000 0000000000000000        		dq		0x0					; Descriptor nulo (reservado)
+    14                                  
+    15                                  	CS_SEL_16	equ		$-GDT				; Descriptor de segmento de codigo de 16bits
+    16 00000008 FFFF                    		dw		0xffff					; limite (16bits)
+    17 0000000A 0000                    		dw		0x0000					; base (16bits)
+    18 0000000C FF                      		db		0xff					; base (8bits)
+    19 0000000D 99                      		db		0x99					; P|DPL[1:0]|S|Type[3:0] (8bits)
+    20 0000000E 40                      		db		0x40					; G|D/B|L|AVL|limite (8bits)
+    21 0000000F FF                      		db		0xff					; base (8bits)
+    22                                  		; Direccion de Base = 0xffff0000
+    23                                  		; Limite = 0x0ffff
+    24                                  		; Granularidad = NO
+    25                                  		; Tamanio de Operandos = 32 bits
+    26                                  		; Habilitar uso del Sistema = NO
+    27                                  		; Nivel de Privilegio = 0
+    28                                  		; Segmento de 64bits = NO
+    29                                  		; Tipo de Descriptor = Codigo
+    30                                  		; Segmento Presente = SI
+    31                                  
+    32                                  	CS_SEL_32	equ		$-GDT				; Descriptor de segmento de codigo de 32bits
+    33 00000010 FFFF                    		dw 		0xffff
+    34 00000012 0000                    		dw 		0x0000
+    35 00000014 00                      		db 		0x00
+    36 00000015 99                      		db 		0x99
+    37 00000016 CF                      		db 		0xcf
+    38 00000017 00                      		db 		0x00
+    39                                  		; Direccion de Base = 0x00000000
+    40                                  		; Limite = 0xfffff
+    41                                  		; Granularidad = SI
+    42                                  		; Tamanio de Operandos = 32 bits
+    43                                  		; Habilitar uso del Sistema = NO
+    44                                  		; Nivel de Privilegio = 0
+    45                                  		; Segmento de 64bits = NO
+    46                                  		; Tipo de Descriptor = Codigo
+    47                                  		; Segmento Presente = SI
+    48                                  
+    49                                  	DS_SEL		equ		$-GDT				; Descriptor de segmento de dato
+    50 00000018 FFFF                    		dw		0xffff
+    51 0000001A 0000                    		dw		0x0000
+    52 0000001C 00                      		db		0x00
+    53 0000001D 92                      		db		0x92
+    54 0000001E CF                      		db		0xcf
+    55 0000001F 00                      		db		0x00
+    56                                  		; Direccion de Base = 0x00000000
+    57                                  		; Limite = 0xfffff
+    58                                  		; Granularidad = SI
+    59                                  		; Tamanio de Operandos = 32 bits
+    60                                  		; Habilitar uso del Sistema = NO
+    61                                  		; Nivel de Privilegio = 0
+    62                                  		; Segmento de 64bits = NO
+    63                                  		; Tipo de Descriptor = Dato
+    64                                  		; Segmento Presente = SI
+    65                                  
+    66                                  	GDT_LENGHT	equ		$-GDT				; Indice del largo de la tabla
+    67                                  
+    68                                  GDTR:
+    69 00000020 1F00                    	dw 		GDT_LENGHT-1
+    70 00000022 [00000F00]              	dd 		BOOT_SEG+GDT

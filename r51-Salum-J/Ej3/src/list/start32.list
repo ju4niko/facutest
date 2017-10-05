@@ -1,0 +1,552 @@
+     1                                  %define EXCEPTION_DE_NUMBER 0
+     2                                  %define EXCEPTION_DB_NUMBER 1
+     3                                  %define EXCEPTION_NMI_NUMBER 2
+     4                                  %define EXCEPTION_BP_NUMBER 3
+     5                                  %define EXCEPTION_OF_NUMBER 4
+     6                                  %define EXCEPTION_BR_NUMBER 5
+     7                                  %define EXCEPTION_UD_NUMBER 6
+     8                                  %define EXCEPTION_NM_NUMBER 7
+     9                                  %define EXCEPTION_DF_NUMBER 8
+    10                                  %define EXCEPTION_TS_NUMBER 10
+    11                                  %define EXCEPTION_NP_NUMBER 11
+    12                                  %define EXCEPTION_SS_NUMBER 12
+    13                                  %define EXCEPTION_GP_NUMBER 13
+    14                                  %define EXCEPTION_PF_NUMBER 14
+    15                                  %define EXCEPTION_MF_NUMBER 16
+    16                                  %define EXCEPTION_AC_NUMBER 17
+    17                                  %define EXCEPTION_MC_NUMBER 18
+    18                                  %define EXCEPTION_XM_NUMBER 19
+    19                                  %define EXCEPTION_VE_NUMBER 20
+    20                                  %define INT_0_NUMBER 32
+    21                                  %define INT_1_NUMBER 33
+    22                                  %define INT_2_NUMBER 34
+    23                                  %define INT_3_NUMBER 35
+    24                                  %define INT_4_NUMBER 36
+    25                                  %define INT_5_NUMBER 37
+    26                                  %define INT_6_NUMBER 38
+    27                                  %define INT_7_NUMBER 39
+    28                                  %define INT_8_NUMBER 40
+    29                                  %define INT_9_NUMBER 41
+    30                                  %define INT_10_NUMBER 42
+    31                                  %define INT_11_NUMBER 43
+    32                                  %define INT_12_NUMBER 44
+    33                                  %define INT_13_NUMBER 45
+    34                                  %define INT_14_NUMBER 46
+    35                                  %define INT_15_NUMBER 47
+    36                                  
+    37                                  SECTION .start32 progbits
+    38                                  
+    39                                  USE32									; Codigo de 32bits
+    40                                  
+    41                                  EXTERN	__STACK_END_32
+    42                                  EXTERN	__STACK_SIZE_32
+    43                                  EXTERN	CS_SEL_32
+    44                                  EXTERN	DS_SEL
+    45                                  EXTERN	kernel32_init
+    46                                  
+    47                                  EXTERN	__IDT_ENTRIES
+    48                                  EXTERN	__IDT_START
+    49                                  EXTERN	__init_idt
+    50                                  EXTERN	__set_idt_entry
+    51                                  EXTERN	__fast_memcpy
+    52                                  EXTERN	___idt_ctrlrs_size
+    53                                  EXTERN	___idt_ctrlrs_vma_st
+    54                                  EXTERN	___idt_ctrlrs_lma_st
+    55                                  
+    56                                  EXTERN	EXCEPTION_DE
+    57                                  EXTERN	EXCEPTION_DB
+    58                                  EXTERN	EXCEPTION_NMI
+    59                                  EXTERN	EXCEPTION_BP
+    60                                  EXTERN	EXCEPTION_OF
+    61                                  EXTERN	EXCEPTION_BR
+    62                                  EXTERN	EXCEPTION_UD
+    63                                  EXTERN	EXCEPTION_NM
+    64                                  EXTERN	EXCEPTION_DF
+    65                                  EXTERN	EXCEPTION_TS
+    66                                  EXTERN	EXCEPTION_NP
+    67                                  EXTERN	EXCEPTION_SS
+    68                                  EXTERN	EXCEPTION_GP
+    69                                  EXTERN	EXCEPTION_PF
+    70                                  EXTERN	EXCEPTION_MF
+    71                                  EXTERN	EXCEPTION_AC
+    72                                  EXTERN	EXCEPTION_MC
+    73                                  EXTERN	EXCEPTION_XM
+    74                                  EXTERN	EXCEPTION_VE
+    75                                  EXTERN	INT_0
+    76                                  EXTERN	INT_1
+    77                                  EXTERN	INT_2
+    78                                  EXTERN	INT_3
+    79                                  EXTERN	INT_4
+    80                                  EXTERN	INT_5
+    81                                  EXTERN	INT_6
+    82                                  EXTERN	INT_7
+    83                                  EXTERN	INT_8
+    84                                  EXTERN	INT_9
+    85                                  EXTERN	INT_10
+    86                                  EXTERN	INT_11
+    87                                  EXTERN	INT_12
+    88                                  EXTERN	INT_13
+    89                                  EXTERN	INT_14
+    90                                  EXTERN	INT_15
+    91                                  
+    92                                  GLOBAL start32_launcher
+    93                                  
+    94                                  start32_launcher:
+    95                                  	; Inicializo selectores de dato
+    96 00000000 66B8[0000]              	mov	ax,DS_SEL
+    97 00000004 8ED8                    	mov	ds,ax
+    98 00000006 8EC0                    	mov	es,ax
+    99 00000008 8EE8                    	mov 	gs, ax
+   100 0000000A 8EE0                    	mov 	fs, ax
+   101                                  
+   102                                  	; Inicializo de la pila
+   103 0000000C 8ED0                    	mov	ss,ax							; Intel recomienda luego de esta linea mover al stack pointer por si llega a haber una interrupcion
+   104                                  									; asi termina de ejecutar esta instruccion y me queda la pila completa
+   105 0000000E BC[00000000]            	mov	esp,__STACK_END_32
+   106 00000013 31C0                    	xor	eax,eax
+   107 00000015 B9[00000000]            	mov	ecx,__STACK_SIZE_32
+   108                                  
+   109                                  	; Cargo la pila con ceros
+   110                                  	.stack_init:
+   111 0000001A 50                      		push	eax
+   112 0000001B E2FD                    		loop	.stack_init
+   113 0000001D BC[00000000]            	mov	esp,__STACK_END_32					; Ubico el stack pointer
+   114                                  
+   115                                  	; Inicializacion de IDT
+   116 00000022 55                      	push	ebp
+   117 00000023 89E5                    	mov	ebp,esp
+   118 00000025 6668[FFFF]              	push	word (__IDT_ENTRIES - 1)
+   119 00000029 68[00000000]            	push	dword __IDT_START
+   120 0000002E E8(00000000)            	call	__init_idt
+   121 00000033 89EC                    	mov	esp, ebp
+   122 00000035 5D                      	pop	ebp
+   123                                     
+   124                                  	; Muevo los handlers de interrupcion de ROM a RAM ya que los voy a utilizar repetidamente
+   125 00000036 55                      	push	ebp
+   126 00000037 89E5                    	mov	ebp,esp
+   127 00000039 68[00000000]            	push	___idt_ctrlrs_size
+   128 0000003E 68[00000000]            	push	___idt_ctrlrs_vma_st
+   129 00000043 68[00000000]            	push	___idt_ctrlrs_lma_st
+   130 00000048 E8(00000000)            	call	__fast_memcpy
+   131 0000004D C9                      	leave
+   132 0000004E 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   133 00000051 7509                    	jne	finalizo_programa
+   134                                  
+   135 00000053 EB0A                    	jmp	inicializo_excepciones					; Inicializo las entradas
+   136                                  
+   137                                  fin_inic_excepciones:
+   138 00000055 EA[00000000][0000]      	jmp	CS_SEL_32:kernel32_init					; Salto al programa en modo protegido ya inicializado el procesador y los registros correctamente
+   139                                  
+   140                                  finalizo_programa:
+   141 0000005C F4                      	hlt
+   142 0000005D EBFD                    	jmp 	finalizo_programa
+   143                                  
+   144                                  
+   145                                  inicializo_excepciones:
+   146                                  
+   147                                  ;TASK GATE: OCURRE UN CAMBIO DE TAREA
+   148                                  ;31             24              16               8               0
+   149                                  ;+-------------------------------+-+---+-+-+-+-+-+---------------+
+   150                                  ;|            RESERVED           |P|DPL|0|0|1|0|1|    RESERVED   |	P: Segment Present Flag, 0->Not In Memory, 1->In Memory
+   151                                  ;|                               | | | |         |               |	DPL: Privilege Level, 00->Kernel, 01->OS Services, 10->OS Services, 11->Applications
+   152                                  ;+--------------+-+---+-+---+----------+-+-+-+-+-+--+-+-+--------+	
+   153                                  ;|     TSS SEGMENT SELECTOR      |            RESERVED           |
+   154                                  ;|                               |                               |
+   155                                  ;+-------------------------------+-------------------------------+
+   156                                  
+   157                                  ;INTERRUPT/TRAP GATE: INTERRUPT GATE LIMPIA EL IF FLAG PARA NO ATENDER OTRAS INT, LA OTRA NO
+   158                                  ;31             24              16               8               0
+   159                                  ;+-------------------------------+-+---+-+-+-+-+-+-+-+-+---------+
+   160                                  ;|         OFFSET(31-16)         |P|DPL|0|D|1|1|X|0|0|0| RESERVED|	D: Size Of Gate, 0->16 bits, 1->32 bits
+   161                                  ;|                               | | | |               |         |	X: 0->Interrupt Gate, 1->Trap Gate
+   162                                  ;+--------------+-+---+-+---+----------+-+-+-+-+-+--+-+-+--------+
+   163                                  ;|       SEGMENT SELECTOR        |         OFFSET(15-0)          |
+   164                                  ;|                               |                               |
+   165                                  ;+-------------------------------+-------------------------------+
+   166                                  
+   167 0000005F 55                      	push	ebp
+   168 00000060 89E5                    	mov	ebp,esp
+   169 00000062 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   170 00000067 68[00000000]            	push	EXCEPTION_DE
+   171                                  	;push	CS_SEL_32
+   172 0000006C 6A00                    	push	EXCEPTION_DE_NUMBER					; Division por 0
+   173 0000006E E8(00000000)            	call	__set_idt_entry
+   174 00000073 C9                      	leave
+   175 00000074 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   176 00000077 75E3                    	jne	finalizo_programa
+   177                                  
+   178 00000079 55                      	push	ebp
+   179 0000007A 89E5                    	mov	ebp,esp
+   180 0000007C 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   181 00000081 68[00000000]            	push	EXCEPTION_DB
+   182 00000086 68[00000000]            	push	CS_SEL_32
+   183 0000008B 6A01                    	push	EXCEPTION_DB_NUMBER					; Excepcion de debug
+   184 0000008D E8(00000000)            	call	__set_idt_entry
+   185 00000092 C9                      	leave
+   186 00000093 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   187 00000096 75C4                    	jne	finalizo_programa
+   188                                  
+   189 00000098 55                      	push	ebp
+   190 00000099 89E5                    	mov	ebp,esp
+   191 0000009B 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   192 000000A0 68[00000000]            	push	EXCEPTION_NMI
+   193 000000A5 68[00000000]            	push	CS_SEL_32
+   194 000000AA 6A02                    	push	EXCEPTION_NMI_NUMBER					; Generada por un pin externo
+   195 000000AC E8(00000000)            	call	__set_idt_entry
+   196 000000B1 C9                      	leave
+   197 000000B2 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   198 000000B5 75A5                    	jne	finalizo_programa
+   199                                  
+   200 000000B7 55                      	push	ebp
+   201 000000B8 89E5                    	mov	ebp,esp
+   202 000000BA 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   203 000000BF 68[00000000]            	push	EXCEPTION_BP
+   204 000000C4 68[00000000]            	push	CS_SEL_32
+   205 000000C9 6A03                    	push	EXCEPTION_BP_NUMBER					; Ejecucion de instruccion de breakpoint
+   206 000000CB E8(00000000)            	call	__set_idt_entry
+   207 000000D0 C9                      	leave
+   208 000000D1 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   209 000000D4 7586                    	jne	finalizo_programa
+   210                                  
+   211 000000D6 55                      	push	ebp
+   212 000000D7 89E5                    	mov	ebp,esp
+   213 000000D9 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   214 000000DE 68[00000000]            	push	EXCEPTION_OF
+   215 000000E3 68[00000000]            	push	CS_SEL_32
+   216 000000E8 6A04                    	push	EXCEPTION_OF_NUMBER					; Overflow cuando se ejecutaba instruccion INTO
+   217 000000EA E8(00000000)            	call	__set_idt_entry
+   218 000000EF C9                      	leave
+   219 000000F0 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   220 000000F3 0F8563FFFFFF            	jne	finalizo_programa
+   221                                  
+   222 000000F9 55                      	push	ebp
+   223 000000FA 89E5                    	mov	ebp,esp
+   224 000000FC 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   225 00000101 68[00000000]            	push	EXCEPTION_BR
+   226 00000106 68[00000000]            	push	CS_SEL_32
+   227 0000010B 6A05                    	push	EXCEPTION_BR_NUMBER					; Rango excedido
+   228 0000010D E8(00000000)            	call	__set_idt_entry
+   229 00000112 C9                      	leave
+   230 00000113 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   231 00000116 0F8540FFFFFF            	jne	finalizo_programa
+   232                                  
+   233 0000011C 55                      	push	ebp
+   234 0000011D 89E5                    	mov	ebp,esp
+   235 0000011F 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   236 00000124 68[00000000]            	push	EXCEPTION_UD
+   237 00000129 68[00000000]            	push	CS_SEL_32
+   238 0000012E 6A06                    	push	EXCEPTION_UD_NUMBER					; Opcode invalido
+   239 00000130 E8(00000000)            	call	__set_idt_entry
+   240 00000135 C9                      	leave
+   241 00000136 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   242 00000139 0F851DFFFFFF            	jne	finalizo_programa
+   243                                  
+   244 0000013F 55                      	push	ebp
+   245 00000140 89E5                    	mov	ebp,esp
+   246 00000142 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   247 00000147 68[00000000]            	push	EXCEPTION_NM
+   248 0000014C 68[00000000]            	push	CS_SEL_32
+   249 00000151 6A07                    	push	EXCEPTION_NM_NUMBER
+   250 00000153 E8(00000000)            	call	__set_idt_entry
+   251 00000158 C9                      	leave
+   252 00000159 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   253 0000015C 0F85FAFEFFFF            	jne	finalizo_programa
+   254                                  
+   255 00000162 55                      	push	ebp
+   256 00000163 89E5                    	mov	ebp,esp
+   257 00000165 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   258 0000016A 68[00000000]            	push	EXCEPTION_DF
+   259 0000016F 68[00000000]            	push	CS_SEL_32
+   260 00000174 6A08                    	push	EXCEPTION_DF_NUMBER
+   261 00000176 E8(00000000)            	call	__set_idt_entry
+   262 0000017B C9                      	leave
+   263 0000017C 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   264 0000017F 0F85D7FEFFFF            	jne	finalizo_programa
+   265                                  	
+   266 00000185 55                      	push	ebp
+   267 00000186 89E5                    	mov	ebp,esp
+   268 00000188 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   269 0000018D 68[00000000]            	push	EXCEPTION_TS
+   270 00000192 68[00000000]            	push	CS_SEL_32
+   271 00000197 6A0A                    	push	EXCEPTION_TS_NUMBER
+   272 00000199 E8(00000000)            	call	__set_idt_entry
+   273 0000019E C9                      	leave
+   274 0000019F 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   275 000001A2 0F85B4FEFFFF            	jne	finalizo_programa
+   276                                  
+   277 000001A8 55                      	push	ebp
+   278 000001A9 89E5                    	mov	ebp,esp
+   279 000001AB 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   280 000001B0 68[00000000]            	push	EXCEPTION_NP
+   281 000001B5 68[00000000]            	push	CS_SEL_32
+   282 000001BA 6A0B                    	push	EXCEPTION_NP_NUMBER
+   283 000001BC E8(00000000)            	call	__set_idt_entry
+   284 000001C1 C9                      	leave
+   285 000001C2 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   286 000001C5 0F8591FEFFFF            	jne	finalizo_programa
+   287                                  
+   288 000001CB 55                      	push	ebp
+   289 000001CC 89E5                    	mov	ebp,esp
+   290 000001CE 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   291 000001D3 68[00000000]            	push	EXCEPTION_SS
+   292 000001D8 68[00000000]            	push	CS_SEL_32
+   293 000001DD 6A0C                    	push	EXCEPTION_SS_NUMBER
+   294 000001DF E8(00000000)            	call	__set_idt_entry
+   295 000001E4 C9                      	leave
+   296 000001E5 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   297 000001E8 0F856EFEFFFF            	jne	finalizo_programa
+   298                                  
+   299 000001EE 55                      	push	ebp
+   300 000001EF 89E5                    	mov	ebp,esp
+   301 000001F1 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   302 000001F6 68[00000000]            	push	EXCEPTION_GP
+   303 000001FB 68[00000000]            	push	CS_SEL_32
+   304 00000200 6A0D                    	push	EXCEPTION_GP_NUMBER
+   305 00000202 E8(00000000)            	call	__set_idt_entry
+   306 00000207 C9                      	leave
+   307 00000208 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   308 0000020B 0F854BFEFFFF            	jne	finalizo_programa
+   309                                  
+   310 00000211 55                      	push	ebp
+   311 00000212 89E5                    	mov	ebp,esp
+   312 00000214 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   313 00000219 68[00000000]            	push	EXCEPTION_PF
+   314 0000021E 68[00000000]            	push	CS_SEL_32
+   315 00000223 6A0E                    	push	EXCEPTION_PF_NUMBER
+   316 00000225 E8(00000000)            	call	__set_idt_entry
+   317 0000022A C9                      	leave
+   318 0000022B 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   319 0000022E 0F8528FEFFFF            	jne	finalizo_programa
+   320                                  
+   321 00000234 55                      	push	ebp
+   322 00000235 89E5                    	mov	ebp,esp
+   323 00000237 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   324 0000023C 68[00000000]            	push	EXCEPTION_MF
+   325 00000241 68[00000000]            	push	CS_SEL_32
+   326 00000246 6A10                    	push	EXCEPTION_MF_NUMBER
+   327 00000248 E8(00000000)            	call	__set_idt_entry
+   328 0000024D C9                      	leave
+   329 0000024E 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   330 00000251 0F8505FEFFFF            	jne	finalizo_programa
+   331                                  
+   332 00000257 55                      	push	ebp
+   333 00000258 89E5                    	mov	ebp,esp
+   334 0000025A 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   335 0000025F 68[00000000]            	push	EXCEPTION_AC
+   336 00000264 68[00000000]            	push	CS_SEL_32
+   337 00000269 6A11                    	push	EXCEPTION_AC_NUMBER
+   338 0000026B E8(00000000)            	call	__set_idt_entry
+   339 00000270 C9                      	leave
+   340 00000271 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   341 00000274 0F85E2FDFFFF            	jne	finalizo_programa
+   342                                  
+   343 0000027A 55                      	push	ebp
+   344 0000027B 89E5                    	mov	ebp,esp
+   345 0000027D 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   346 00000282 68[00000000]            	push	EXCEPTION_MC
+   347 00000287 68[00000000]            	push	CS_SEL_32
+   348 0000028C 6A12                    	push	EXCEPTION_MC_NUMBER
+   349 0000028E E8(00000000)            	call	__set_idt_entry
+   350 00000293 C9                      	leave
+   351 00000294 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   352 00000297 0F85BFFDFFFF            	jne	finalizo_programa
+   353                                  
+   354 0000029D 55                      	push	ebp
+   355 0000029E 89E5                    	mov	ebp,esp
+   356 000002A0 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   357 000002A5 68[00000000]            	push	EXCEPTION_XM
+   358 000002AA 68[00000000]            	push	CS_SEL_32
+   359 000002AF 6A13                    	push	EXCEPTION_XM_NUMBER
+   360 000002B1 E8(00000000)            	call	__set_idt_entry
+   361 000002B6 C9                      	leave
+   362 000002B7 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   363 000002BA 0F859CFDFFFF            	jne	finalizo_programa
+   364                                  
+   365 000002C0 55                      	push	ebp
+   366 000002C1 89E5                    	mov	ebp,esp
+   367 000002C3 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   368 000002C8 68[00000000]            	push	EXCEPTION_VE
+   369 000002CD 68[00000000]            	push	CS_SEL_32
+   370 000002D2 6A14                    	push	EXCEPTION_VE_NUMBER
+   371 000002D4 E8(00000000)            	call	__set_idt_entry
+   372 000002D9 C9                      	leave
+   373 000002DA 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   374 000002DD 0F8579FDFFFF            	jne	finalizo_programa
+   375                                  
+   376 000002E3 55                      	push	ebp
+   377 000002E4 89E5                    	mov	ebp,esp
+   378 000002E6 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   379 000002EB 68[00000000]            	push	INT_0
+   380 000002F0 68[00000000]            	push	CS_SEL_32
+   381 000002F5 6A20                    	push	INT_0_NUMBER
+   382 000002F7 E8(00000000)            	call	__set_idt_entry
+   383 000002FC C9                      	leave
+   384 000002FD 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   385 00000300 0F8556FDFFFF            	jne	finalizo_programa
+   386                                  
+   387 00000306 55                      	push	ebp
+   388 00000307 89E5                    	mov	ebp,esp
+   389 00000309 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   390 0000030E 68[00000000]            	push	INT_1
+   391 00000313 68[00000000]            	push	CS_SEL_32
+   392 00000318 6A21                    	push	INT_1_NUMBER
+   393 0000031A E8(00000000)            	call	__set_idt_entry
+   394 0000031F C9                      	leave
+   395 00000320 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   396 00000323 0F8533FDFFFF            	jne	finalizo_programa
+   397                                  
+   398 00000329 55                      	push	ebp
+   399 0000032A 89E5                    	mov	ebp,esp
+   400 0000032C 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   401 00000331 68[00000000]            	push	INT_2
+   402 00000336 68[00000000]            	push	CS_SEL_32
+   403 0000033B 6A22                    	push	INT_2_NUMBER
+   404 0000033D E8(00000000)            	call	__set_idt_entry
+   405 00000342 C9                      	leave
+   406 00000343 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   407 00000346 0F8510FDFFFF            	jne	finalizo_programa
+   408                                  
+   409 0000034C 55                      	push	ebp
+   410 0000034D 89E5                    	mov	ebp,esp
+   411 0000034F 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   412 00000354 68[00000000]            	push	INT_3
+   413 00000359 68[00000000]            	push	CS_SEL_32
+   414 0000035E 6A23                    	push	INT_3_NUMBER
+   415 00000360 E8(00000000)            	call	__set_idt_entry
+   416 00000365 C9                      	leave
+   417 00000366 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   418 00000369 0F85EDFCFFFF            	jne	finalizo_programa
+   419                                  
+   420 0000036F 55                      	push	ebp
+   421 00000370 89E5                    	mov	ebp,esp
+   422 00000372 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   423 00000377 68[00000000]            	push	INT_4
+   424 0000037C 68[00000000]            	push	CS_SEL_32
+   425 00000381 6A24                    	push	INT_4_NUMBER
+   426 00000383 E8(00000000)            	call	__set_idt_entry
+   427 00000388 C9                      	leave
+   428 00000389 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   429 0000038C 0F85CAFCFFFF            	jne	finalizo_programa
+   430                                  
+   431 00000392 55                      	push	ebp
+   432 00000393 89E5                    	mov	ebp,esp
+   433 00000395 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   434 0000039A 68[00000000]            	push	INT_5
+   435 0000039F 68[00000000]            	push	CS_SEL_32
+   436 000003A4 6A25                    	push	INT_5_NUMBER
+   437 000003A6 E8(00000000)            	call	__set_idt_entry
+   438 000003AB C9                      	leave
+   439 000003AC 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   440 000003AF 0F85A7FCFFFF            	jne	finalizo_programa
+   441                                  
+   442 000003B5 55                      	push	ebp
+   443 000003B6 89E5                    	mov	ebp,esp
+   444 000003B8 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   445 000003BD 68[00000000]            	push	INT_6
+   446 000003C2 68[00000000]            	push	CS_SEL_32
+   447 000003C7 6A26                    	push	INT_6_NUMBER
+   448 000003C9 E8(00000000)            	call	__set_idt_entry
+   449 000003CE C9                      	leave
+   450 000003CF 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   451 000003D2 0F8584FCFFFF            	jne	finalizo_programa
+   452                                  
+   453 000003D8 55                      	push	ebp
+   454 000003D9 89E5                    	mov	ebp,esp
+   455 000003DB 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   456 000003E0 68[00000000]            	push	INT_7
+   457 000003E5 68[00000000]            	push	CS_SEL_32
+   458 000003EA 6A27                    	push	INT_7_NUMBER
+   459 000003EC E8(00000000)            	call	__set_idt_entry
+   460 000003F1 C9                      	leave
+   461 000003F2 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   462 000003F5 0F8561FCFFFF            	jne	finalizo_programa
+   463                                  
+   464 000003FB 55                      	push	ebp
+   465 000003FC 89E5                    	mov	ebp,esp
+   466 000003FE 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   467 00000403 68[00000000]            	push	INT_8
+   468 00000408 68[00000000]            	push	CS_SEL_32
+   469 0000040D 6A28                    	push	INT_8_NUMBER
+   470 0000040F E8(00000000)            	call	__set_idt_entry
+   471 00000414 C9                      	leave
+   472 00000415 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   473 00000418 0F853EFCFFFF            	jne	finalizo_programa
+   474                                  
+   475 0000041E 55                      	push	ebp
+   476 0000041F 89E5                    	mov	ebp,esp
+   477 00000421 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   478 00000426 68[00000000]            	push	INT_9
+   479 0000042B 68[00000000]            	push	CS_SEL_32
+   480 00000430 6A29                    	push	INT_9_NUMBER
+   481 00000432 E8(00000000)            	call	__set_idt_entry
+   482 00000437 C9                      	leave
+   483 00000438 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   484 0000043B 0F851BFCFFFF            	jne	finalizo_programa
+   485                                  
+   486 00000441 55                      	push	ebp
+   487 00000442 89E5                    	mov	ebp,esp
+   488 00000444 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   489 00000449 68[00000000]            	push	INT_10
+   490 0000044E 68[00000000]            	push	CS_SEL_32
+   491 00000453 6A2A                    	push	INT_10_NUMBER
+   492 00000455 E8(00000000)            	call	__set_idt_entry
+   493 0000045A C9                      	leave
+   494 0000045B 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   495 0000045E 0F85F8FBFFFF            	jne	finalizo_programa
+   496                                  
+   497 00000464 55                      	push	ebp
+   498 00000465 89E5                    	mov	ebp,esp
+   499 00000467 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   500 0000046C 68[00000000]            	push	INT_11
+   501 00000471 68[00000000]            	push	CS_SEL_32
+   502 00000476 6A2B                    	push	INT_11_NUMBER
+   503 00000478 E8(00000000)            	call	__set_idt_entry
+   504 0000047D C9                      	leave
+   505 0000047E 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   506 00000481 0F85D5FBFFFF            	jne	finalizo_programa
+   507                                  
+   508 00000487 55                      	push	ebp
+   509 00000488 89E5                    	mov	ebp,esp
+   510 0000048A 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   511 0000048F 68[00000000]            	push	INT_12
+   512 00000494 68[00000000]            	push	CS_SEL_32
+   513 00000499 6A2C                    	push	INT_12_NUMBER
+   514 0000049B E8(00000000)            	call	__set_idt_entry
+   515 000004A0 C9                      	leave
+   516 000004A1 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   517 000004A4 0F85B2FBFFFF            	jne	finalizo_programa
+   518                                  
+   519 000004AA 55                      	push	ebp
+   520 000004AB 89E5                    	mov	ebp,esp
+   521 000004AD 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   522 000004B2 68[00000000]            	push	INT_13
+   523 000004B7 68[00000000]            	push	CS_SEL_32
+   524 000004BC 6A2D                    	push	INT_13_NUMBER
+   525 000004BE E8(00000000)            	call	__set_idt_entry
+   526 000004C3 C9                      	leave
+   527 000004C4 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   528 000004C7 0F858FFBFFFF            	jne	finalizo_programa
+   529                                  
+   530 000004CD 55                      	push	ebp
+   531 000004CE 89E5                    	mov	ebp,esp
+   532 000004D0 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   533 000004D5 68[00000000]            	push	INT_14
+   534 000004DA 68[00000000]            	push	CS_SEL_32
+   535 000004DF 6A2E                    	push	INT_14_NUMBER
+   536 000004E1 E8(00000000)            	call	__set_idt_entry
+   537 000004E6 C9                      	leave
+   538 000004E7 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   539 000004EA 0F856CFBFFFF            	jne	finalizo_programa
+   540                                  
+   541 000004F0 55                      	push	ebp
+   542 000004F1 89E5                    	mov	ebp,esp
+   543 000004F3 688F000000              	push	0x8f							; 0b10001111->Segmento presente, Privilegio de Kernel, Selector de 32bits, Trap Gate
+   544 000004F8 68[00000000]            	push	INT_15
+   545 000004FD 68[00000000]            	push	CS_SEL_32
+   546 00000502 6A2F                    	push	INT_15_NUMBER
+   547 00000504 E8(00000000)            	call	__set_idt_entry
+   548 00000509 C9                      	leave
+   549 0000050A 83F801                  	cmp	eax, 1							; Analizo el valor de retorno (1 Exito -1 Fallo)
+   550 0000050D 0F8549FBFFFF            	jne	finalizo_programa
+   551                                  
+   552 00000513 E93DFBFFFF              	jmp	fin_inic_excepciones
